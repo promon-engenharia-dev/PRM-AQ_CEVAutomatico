@@ -84,6 +84,7 @@ No Claude Code, basta pedir "faça a revisão assistida deste PDF" e a skill con
 Para quem vai só usar a ferramenta, não é preciso instalar Python. Basta entregar a pasta `dist\VerificadorCEV\`, que contém:
 
 - `verificador.exe`: programa único (~40 MB) que já traz dentro o Python, as bibliotecas, a interface, os logos e o `regras.json`;
+- `verificador-cmd.exe`: o mesmo programa com console, para rodar pelo cmd (`verificador-cmd arquivo.pdf`, opções em `--help`, código de saída 1 se algum PDF falhar);
 - `Verificador.bat`: atalho para abrir a janela ou arrastar PDFs. Ele usa o exe automaticamente;
 - `regras.json`: cópia editável dos parâmetros, lida no lugar da cópia interna. Se for apagada, o exe usa a interna;
 - `LEIA-ME.txt`: instruções curtas para o usuário.
@@ -94,10 +95,10 @@ Para quem vai só usar a ferramenta, não é preciso instalar Python. Basta entr
 ferramentas\gerar_exe.bat
 ```
 
-O exe é gerado com o PyInstaller (`pip install pyinstaller`) em `--onefile --windowed`. Os arquivos de trabalho ficam em `%TEMP%\VerificadorCEV_build`. A pasta `dist/` não é versionada.
+Os exes são gerados com o PyInstaller (`pip install pyinstaller`) em `--onefile`: o `verificador.exe` com `--windowed` e o `verificador-cmd.exe` com `--console`. Os arquivos de trabalho ficam em `%TEMP%\VerificadorCEV_build`. A pasta `dist/` não é versionada.
 
 **Observações:**
-- O exe abre sem console, por isso a linha de comando não mostra mensagens. Os arquivos de saída são gravados normalmente. Para usar a CLI com mensagens, rode com Python.
+- O `verificador.exe` abre sem console, por isso não mostra mensagens no cmd. Para a linha de comando, use o `verificador-cmd.exe`.
 - O exe não é assinado digitalmente. O Windows SmartScreen pode avisar na primeira execução (clique em "Mais informações" → "Executar assim mesmo"), principalmente se o arquivo vier por e-mail ou Teams. Distribuir pela pasta do SharePoint/OneDrive costuma evitar o aviso.
 - A primeira abertura leva alguns segundos, porque o exe se descompacta numa pasta temporária.
 ## Requisitos

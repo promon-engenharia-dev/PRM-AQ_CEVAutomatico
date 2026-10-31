@@ -9,6 +9,16 @@ Como usar
   se marcado na janela, o relatorio <arquivo>_CEV.html e a lista em CSV.
   O PDF original nao e alterado.
 
+Pelo cmd (linha de comando)
+---------------------------
+- Use o verificador-cmd.exe (mesmo programa, com saida no console):
+    cd /d "pasta\do\VerificadorCEV"
+    verificador-cmd "C:\caminho\prancha.pdf"
+    verificador-cmd a.pdf b.pdf --sem-formulario --html --csv
+- Opcoes: verificador-cmd --help
+- Codigo de saida: 0 = todos os PDFs processados; 1 = algum falhou.
+- Sem arquivos (ou com --janela), abre a janela.
+
 Nao precisa instalar nada
 -------------------------
 - O verificador.exe ja traz tudo dentro. Funciona no Windows 10/11.
@@ -22,7 +32,8 @@ Confidencialidade
 
 Arquivos desta pasta
 --------------------
-- verificador.exe   programa
+- verificador.exe   programa (janela)
+- verificador-cmd.exe  o mesmo programa para o cmd
 - Verificador.bat   atalho (abrir / arrastar PDFs)
 - regras.json       parametros e textos dos comentarios (pode ser editado;
                     se apagado, o exe usa a copia interna)

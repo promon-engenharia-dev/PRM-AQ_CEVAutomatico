@@ -23,4 +23,4 @@ Não rediscuta estas decisões sem motivo novo. O histórico completo está no `
 | Quadros | Quadro de Ambientes e Quadro de Áreas só nas plantas gerais, não em ampliações (TAB-01, 28/10/2026) |
 | Setorização | Planta-chave de layout/departamentos nas plantas gerais, seguindo o padrão `padroes/padrao-setorizacao.html` (`regras.json → setorizacao`). Proposta em 28/10/2026, aguardando aprovação do padrão. A falta da planta-chave (PRA-12) é cobrada em **todos os projetos** (30/10/2026) |
 | Disciplina | A ferramenta é específica de Arquitetura (AQ). Outra disciplina pede catálogo próprio |
-| Distribuição | Executável único (PyInstaller, onefile e windowed) em `dist\VerificadorCEV` |
+| Distribuição | Executável único (PyInstaller, onefile e windowed) em `dist\VerificadorCEV`, mais `verificador-cmd.exe` (console) para o cmd |

@@ -528,6 +528,7 @@ Para rodar os protótipos: `python -X utf8 -m verificador --lote 2 arquivo.pdf`.
 **O que ficou:**
 - `ferramentas\gerar_exe.bat` gera `dist\VerificadorCEV\` com o exe, o `Verificador.bat`, o `regras.json` e o `LEIA-ME.txt`. O exe tem cerca de 40 MB e é gerado com PyInstaller `--onefile --windowed`.
 - O ponto de entrada é `ferramentas\entrada_exe.py`.
+- **30/10/2026:** o pacote ganhou o `verificador-cmd.exe` (mesmo ponto de entrada, `--console`) para rodar pelo cmd com mensagens e código de saída. Testado fora do projeto: CSV idêntico ao da versão Python, saída 0 com sucesso e 1 com PDF inexistente.
 
 **Teste, com o exe sozinho numa pasta fora do projeto e sem `regras.json` ao lado:**
 - os 3 PDFs de `referencias/originais` geraram CSVs idênticos aos da versão Python;
