@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verificador de Projetos — Arquitetura</title>
+<!-- Identidade Promon: promon-parametros-formatacao.md (§1, §2, §2.1, §7.1, §9). Página local: nada vem da internet. -->
+<style>
+:root{
+  --bg:#EDF1F4;--surface:#FFFFFF;--surface-alt:#F8FAFC;--surface-head:#F1F5F8;--surface-info:#F4F7F9;
+  --line:#E2E8EC;--line-soft:#EDF1F4;--line-strong:#CDD9E0;--line-field:#C9D3DB;--hover:#EAF2F8;--hover-head:#E4EDF3;
+  --texto:#333F48;--texto-2:#5B6770;--texto-3:#7C878E;--azul:#004976;--azul-hover:#01426A;--sobre-azul:#FFFFFF;
+  --laranja:#E35205;--laranja-txt:#BE531C;--acento-bg:#FDEEE5;
+  --erro-bg:#F7E4E2;--erro-fg:#911913;--aten-bg:#FBF0DD;--aten-fg:#8A5A00;--ok-bg:#E4F1EA;--ok-fg:#2E7D5B;
+  --sombra:0 1px 2px rgba(16,42,67,.04);--fonte:'Soleto','Mulish',Tahoma,Arial,sans-serif;
+  --mono:Consolas,'Liberation Mono',monospace;color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141A20;--surface:#1D252D;--surface-alt:#222B33;--surface-head:#22303B;--surface-info:#26394A;
+  --line:#33404B;--line-soft:#2A353F;--line-strong:#3E4C57;--line-field:#3E4C57;--hover:#26394A;--hover-head:#2A3F52;
+  --texto:#E6EBEF;--texto-2:#A2AAAD;--texto-3:#A2AAAD;--azul:#8DBBD3;--azul-hover:#A9CCDF;--sobre-azul:#141A20;
+  --laranja:#FF671F;--laranja-txt:#FF9D6E;--acento-bg:#2E231D;
+  --erro-bg:#3A1E1C;--erro-fg:#F0A39C;--aten-bg:#33291A;--aten-fg:#F2AB1C;--ok-bg:#16301F;--ok-fg:#7CC99E;
+  --sombra:0 1px 2px rgba(0,0,0,.28);color-scheme:dark}
+  :root:not([data-theme="light"]) .logo.pos{display:none} :root:not([data-theme="light"]) .logo.neg{display:block}}
+:root[data-theme="dark"] .logo.pos{display:none} :root[data-theme="dark"] .logo.neg{display:block}
+:root[data-theme="dark"]{
+  --bg:#141A20;--surface:#1D252D;--surface-alt:#222B33;--surface-head:#22303B;--surface-info:#26394A;
+  --line:#33404B;--line-soft:#2A353F;--line-strong:#3E4C57;--line-field:#3E4C57;--hover:#26394A;--hover-head:#2A3F52;
+  --texto:#E6EBEF;--texto-2:#A2AAAD;--texto-3:#A2AAAD;--azul:#8DBBD3;--azul-hover:#A9CCDF;--sobre-azul:#141A20;
+  --laranja:#FF671F;--laranja-txt:#FF9D6E;--acento-bg:#2E231D;
+  --erro-bg:#3A1E1C;--erro-fg:#F0A39C;--aten-bg:#33291A;--aten-fg:#F2AB1C;--ok-bg:#16301F;--ok-fg:#7CC99E;
+  --sombra:0 1px 2px rgba(0,0,0,.28);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--texto);font:500 13px/1.45 var(--fonte);-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+header{background:var(--surface);border-bottom:1px solid var(--line);padding:14px 28px;display:flex;align-items:center;gap:16px}
+header h1{margin:0;font-size:18px;font-weight:800;color:var(--azul)}
+header p{margin:2px 0 0;font-size:11.5px;color:var(--texto-3)}
+header .regua{width:1px;align-self:stretch;background:var(--line)}
+header .local{margin-left:auto}
+/* logo oficial: 30 px de altura, área de proteção x/2 (~6 px) livre em volta (MD §5 e §7.1) */
+.logo{height:30px;width:auto;display:block;margin:6px}
+.logo.neg{display:none}
+.filete{height:2px;background:var(--laranja);flex:none}
+main{flex:1;min-height:0;display:grid;grid-template-columns:440px 1fr;gap:16px;padding:18px 28px;max-width:1500px;width:100%;margin:0 auto}
+.coluna{display:flex;flex-direction:column;gap:16px;min-height:0}
+.cartao{background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:var(--sombra);padding:16px;min-height:0}
+.cartao.flex{display:flex;flex-direction:column}
+h2{font-size:15px;font-weight:800;color:var(--azul);border-left:3px solid var(--laranja);padding-left:10px;margin:0 0 4px}
+.ajuda{font-size:11.5px;color:var(--texto-2);margin:2px 0 10px}
+.btn{background:var(--surface);border:1px solid var(--line-field);border-radius:5px;padding:7px 14px;cursor:pointer;
+  color:var(--azul);font-weight:700;white-space:nowrap}
+.btn:hover{background:var(--hover)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.prim{background:var(--azul);border-color:var(--azul);color:var(--sobre-azul)}
+.btn.prim:hover{background:var(--azul-hover)}
+.btn.peq{padding:4px 10px;font-size:12px}
+.btn[aria-pressed=true]{border-color:var(--azul);box-shadow:inset 0 -2px 0 var(--laranja)}
+.linha-bts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* arquivos */
+.soltar{border:1.5px dashed var(--line-strong);border-radius:6px;background:var(--surface-alt);padding:10px;
+  flex:1;min-height:150px;overflow:auto;margin-bottom:10px;position:relative}
+.soltar.ativo{border-color:var(--azul);background:var(--hover)}
+.soltar .vazio{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--texto-3);font-size:12px;text-align:center;pointer-events:none}
+.soltar .vazio b{color:var(--azul);font-size:13px}
+.arq{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:6px 8px;border-radius:5px;
+  border-bottom:1px solid var(--line-soft)}
+.arq:last-child{border-bottom:0}
+.arq .nome{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arq .sit{font-size:11px;color:var(--texto-3);white-space:nowrap}
+.arq .sit.ok{color:var(--ok-fg);font-weight:800}.arq .sit.falha{color:var(--erro-fg);font-weight:800}
+.arq .sit.ativo{color:var(--laranja-txt);font-weight:800}
+.x{border:0;background:none;color:var(--texto-3);cursor:pointer;font-size:15px;line-height:1;padding:0 2px}
+.x:hover{color:var(--erro-fg)}
+/* opções */
+.campo{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:center;margin-top:8px}
+.campo label{font-weight:600}
+.dica{grid-column:2/4;font-size:11px;color:var(--texto-3);margin-top:-4px}
+input[type=text],select{background:var(--surface);border:1px solid var(--line-field);border-radius:5px;padding:6px 8px;width:100%;min-width:0}
+input:focus,select:focus{outline:none;border-color:var(--azul)}
+.marcar{display:flex;gap:8px;align-items:center;margin-top:12px;cursor:pointer}
+.marcar input{accent-color:var(--azul);width:15px;height:15px}
+.saidas{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}
+.saidas .marcar{margin-top:0}
+.saidas .fixo{color:var(--texto-3)}
+.sub-rot{font-weight:600;margin-top:12px}
+.acao{display:flex;gap:12px;align-items:center}
+.barra{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.barra i{display:block;height:100%;width:0;background:var(--azul);transition:width .2s}
+.status{font-size:11.5px;color:var(--texto-2);min-height:17px}
+/* resultado */
+.kpis{display:flex;gap:36px;margin:6px 0 12px}
+.kpi .rot{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--texto-3);font-weight:700}
+.kpi .num{font-size:29px;font-weight:800;color:var(--azul);font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi.erro .num{color:var(--erro-fg)}.kpi.aten .num{color:var(--aten-fg)}
+.kpi .sub{font-size:11px;color:var(--texto-3)}
+.tabela{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);border-radius:5px}
+table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+thead th{background:var(--surface-head);color:var(--azul);font-size:10.5px;font-weight:700;text-align:center;
+  border-bottom:1.5px solid var(--line-strong);padding:8px 6px;position:sticky;top:0;z-index:1}
+tbody td{padding:6px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:var(--surface-alt)}
+tbody tr:hover{background:var(--hover)}
+tbody tr.sel{background:var(--hover-head);box-shadow:inset 3px 0 0 var(--laranja)}
+td.num{text-align:right;white-space:nowrap}td.cod{white-space:nowrap;font-family:var(--mono);font-size:11.5px}
+td.arqcol{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.txt{min-width:240px}
+td select{min-width:110px;padding:3px 4px;font-size:12px}
+.sev{display:inline-block;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:800;letter-spacing:.3px}
+.sev.ERRO{background:var(--erro-bg);color:var(--erro-fg)}.sev.ATENCAO{background:var(--aten-bg);color:var(--aten-fg)}
+.vazio-res{padding:40px 10px;text-align:center;color:var(--texto-3)}
+.detalhe{margin-top:10px;background:var(--surface-info);border:1px solid var(--line);border-radius:5px;padding:9px 12px;
+  font-size:12.5px;min-height:56px}
+.detalhe .meta{font-size:11px;color:var(--texto-3);margin-bottom:2px}
+.rodape-res{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.rodape-res .esp{flex:1;font-size:11.5px;color:var(--texto-3)}
+/* ficha (diálogo) */
+dialog{border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--texto);padding:0;width:720px;
+  max-width:calc(100vw - 40px);box-shadow:var(--sombra)}
+dialog::backdrop{background:rgba(16,24,32,.45)}
+.dlg-cab{padding:16px 20px 8px}.dlg-corpo{padding:4px 20px 8px;max-height:62vh;overflow:auto}
+.dlg-rodape{padding:12px 20px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--line)}
+.fcampo{display:grid;grid-template-columns:200px 1fr;gap:10px;align-items:center;padding:4px 0}
+.fcampo .rot{font-weight:600;display:flex;gap:6px;align-items:center}
+.info-i{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;
+  border:1px solid var(--azul);color:var(--azul);font-size:10px;font-weight:800;cursor:help;position:relative;flex:none}
+.info-i .tip{display:none;position:absolute;left:22px;top:-6px;width:340px;background:var(--surface-info);color:var(--texto);
+  border:1px solid var(--line-strong);border-radius:5px;padding:8px 10px;font-weight:500;font-size:11.5px;line-height:1.4;
+  z-index:5;box-shadow:var(--sombra)}
+.info-i:hover .tip,.info-i:focus .tip{display:block}
+.fcampo .comld{display:flex;gap:6px}
+.aviso{background:var(--acento-bg);border:1px solid var(--laranja);border-radius:5px;padding:8px 10px;font-size:11.5px;
+  color:var(--laranja-txt);margin-top:8px;display:none}
+.toast{position:fixed;right:24px;bottom:20px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--laranja);
+  border-radius:5px;padding:10px 14px;box-shadow:var(--sombra);font-size:12px;display:none;max-width:480px;z-index:10}
+footer{font-size:10.5px;color:var(--texto-3);text-align:center;padding:0 0 10px}
+</style>
+</head>
+<body>
+<header>
+  <img class="logo pos" src="img/logo-promon-positivo.png" alt="Promon Engenharia">
+  <img class="logo neg" src="img/logo-promon-negativo.png" alt="Promon Engenharia">
+  <div class="regua"></div>
+  <div><h1>Verificador de Projetos — Arquitetura</h1><p>Verificação automática de apresentação · CEV</p></div>
+  <p class="local">Processamento 100% local — nenhum arquivo sai deste computador.</p>
+</header>
+<div class="filete"></div>
+
+<main>
+  <div class="coluna">
+    <section class="cartao flex" style="flex:1">
+      <h2>1 · Arquivos</h2>
+      <p class="ajuda">PDFs de pranchas ou relatórios.</p>
+      <div id="soltar" class="soltar">
+        <div class="vazio" id="vazio"><b>Arraste os PDFs para cá</b>ou use “Adicionar PDFs…”</div>
+        <div id="lista"></div>
+      </div>
+      <div class="linha-bts">
+        <button class="btn" id="bt-add">Adicionar PDFs…</button>
+        <button class="btn" id="bt-limpar">Limpar</button>
+      </div>
+    </section>
+
+    <section class="cartao">
+      <h2>2 · Opções</h2>
+      <div class="campo"><label for="ld">LD do projeto</label><input type="text" id="ld" placeholder="automática">
+        <button class="btn peq" id="bt-ld">Escolher…</button>
+        <span class="dica">Vazio: procura a LD da operação (*-PL2-*.xlsx) na pasta do PDF e acima.</span></div>
+      <div class="campo"><label for="saida">Pasta de saída</label><input type="text" id="saida" placeholder="a mesma do PDF">
+        <button class="btn peq" id="bt-saida">Escolher…</button>
+        <span class="dica">Vazio: grava o _CEV.pdf ao lado de cada PDF.</span></div>
+      <label class="marcar"><input type="checkbox" id="usar-ficha" checked> Preencher a ficha da emissão para cada PDF</label>
+      <div class="sub-rot">Arquivos gravados</div>
+      <div class="saidas">
+        <label class="marcar fixo" title="Sempre gravado"><input type="checkbox" checked disabled> PDF anotado (_CEV.pdf)</label>
+        <label class="marcar"><input type="checkbox" id="saida-html" checked> Relatório HTML</label>
+        <label class="marcar"><input type="checkbox" id="saida-csv"> Lista em CSV</label>
+      </div>
+    </section>
+
+    <div>
+      <div class="acao"><button class="btn prim" id="bt-verificar">Verificar</button><div class="barra"><i id="progresso"></i></div></div>
+      <div class="status" id="status">Adicione os PDFs e clique em Verificar.</div>
+    </div>
+  </div>
+
+  <section class="cartao flex">
+    <h2>3 · Resultado</h2>
+    <div class="kpis">
+      <div class="kpi"><div class="rot">Achados</div><div class="num" id="k-total">—</div><div class="sub" id="k-arq">nenhum arquivo verificado</div></div>
+      <div class="kpi erro"><div class="rot">Erro</div><div class="num" id="k-erro">—</div><div class="sub">divergência objetiva</div></div>
+      <div class="kpi aten"><div class="rot">Atenção</div><div class="num" id="k-aten">—</div><div class="sub">o verificador confirma</div></div>
+    </div>
+    <div class="linha-bts" style="margin-bottom:10px" role="group" aria-label="Filtrar">
+      <span class="ajuda" style="margin:0">Mostrar:</span>
+      <button class="btn peq" data-f="todos" aria-pressed="true">Todos</button>
+      <button class="btn peq" data-f="ERRO" aria-pressed="false">Erro</button>
+      <button class="btn peq" data-f="ATENCAO" aria-pressed="false">Atenção</button>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Arquivo</th><th>Índice</th><th>Folha</th><th>Severidade</th><th>Regra</th><th>Comentário</th>
+          <th>Ocorr.</th><th>Avaliação</th></tr></thead>
+        <tbody id="corpo"><tr><td colspan="8" class="vazio-res">Os achados aparecem aqui.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="detalhe" id="detalhe"><div class="meta">Selecione um achado para ver o comentário completo.</div></div>
+    <div class="rodape-res">
+      <span class="esp">Dois cliques num achado abrem o PDF anotado.</span>
+      <button class="btn" id="bt-avaliacao">Salvar avaliação</button>
+      <button class="btn" id="bt-pasta">Abrir pasta</button>
+      <button class="btn" id="bt-relatorio">Abrir relatório</button>
+      <button class="btn prim" id="bt-pdf">Abrir PDF anotado</button>
+    </div>
+  </section>
+</main>
+<footer>O juízo técnico de engenharia é do verificador. A ferramenta aponta apenas questões de apresentação.</footer>
+
+<dialog id="dlg-ficha">
+  <div class="dlg-cab"><h2>Ficha da emissão</h2><p class="ajuda" id="f-nome"></p>
+    <p class="ajuda">Valores <b>corretos</b> esperados para esta emissão. Passe o mouse sobre o ⓘ para ver a explicação
+      de cada campo. Campos vazios não são comparados.</p>
+    <div class="aviso" id="f-aviso"></div></div>
+  <div class="dlg-corpo" id="f-campos"></div>
+  <div class="dlg-rodape">
+    <button class="btn" id="f-sem">Verificar sem ficha</button>
+    <button class="btn prim" id="f-ok">Salvar ficha e verificar</button>
+  </div>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+const tema = new URLSearchParams(location.hash.slice(1)).get('tema');   // só para teste: #tema=claro|escuro
+if (tema === 'claro') document.documentElement.dataset.theme = 'light';
+if (tema === 'escuro') document.documentElement.dataset.theme = 'dark';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const app = {
+  arquivos: [], achados: [], resultados: {}, filtro: 'todos', sel: null, campos: [], rodando: false,
+
+  async iniciar() {
+    const c = await pywebview.api.configuracao();
+    this.campos = c.campos;
+    const pr = c.preferencias || {};
+    $('#saida-html').checked = pr.html !== false; $('#saida-csv').checked = !!pr.csv;
+    $('#usar-ficha').checked = pr.usar_ficha !== false;
+    for (const id of ['#saida-html', '#saida-csv', '#usar-ficha'])
+      $(id).addEventListener('change', () => pywebview.api.salvar_preferencias(
+        {html: $('#saida-html').checked, csv: $('#saida-csv').checked, usar_ficha: $('#usar-ficha').checked}));
+    this.incluir(c.iniciais);
+    const mm = matchMedia('(prefers-color-scheme: dark)');
+    const avisar = () => pywebview.api.tema(document.documentElement.dataset.theme === 'dark' ||
+                                            (!document.documentElement.dataset.theme && mm.matches));
+    mm.addEventListener('change', avisar); avisar();
+  },
+
+  incluir(infos) {
+    for (const i of infos || []) if (!this.arquivos.some(a => a.caminho === i.caminho))
+      this.arquivos.push({...i, sit: 'na fila', classe: ''});
+    this.desenharArquivos();
+  },
+  desenharArquivos() {
+    $('#vazio').style.display = this.arquivos.length ? 'none' : 'flex';
+    $('#lista').innerHTML = this.arquivos.map((a, k) =>
+      `<div class="arq" title="${esc(a.caminho)}"><span class="nome">${esc(a.nome)}</span>
+       <span class="sit ${a.classe}">${esc(a.sit)}</span>
+       <button class="x" aria-label="Remover" data-k="${k}" ${this.rodando ? 'disabled' : ''}>×</button></div>`).join('');
+  },
+  situacao(a, sit, classe = '') { a.sit = sit; a.classe = classe; this.desenharArquivos(); },
+  status(t) { $('#status').textContent = t; },
+  toast(t) { const e = $('#toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(this._t);
+             this._t = setTimeout(() => e.style.display = 'none', 6000); },
+  opcoes() { return {ld: $('#ld').value.trim(), saida: $('#saida').value.trim(), usar_ficha: $('#usar-ficha').checked,
+                      html: $('#saida-html').checked, csv: $('#saida-csv').checked}; },
+
+  async verificar() {
+    const fila = this.arquivos.filter(a => a.classe !== 'ok');
+    if (!fila.length) { this.toast(this.arquivos.length ? 'Todos os arquivos já foram verificados.' : 'Adicione pelo menos um PDF.'); return; }
+    this.rodando = true; $('#bt-verificar').disabled = true; this.desenharArquivos();
+    const op = this.opcoes(); let n = 0;
+    for (const a of fila) {
+      this.situacao(a, 'lendo…', 'ativo'); this.status(`Lendo ${a.nome} (${n + 1} de ${fila.length})…`);
+      const pre = await pywebview.api.preparar(a.caminho, op);
+      if (pre.erro) { this.situacao(a, 'falhou', 'falha'); this.toast(`${a.nome}: ${pre.erro}`); n++; continue; }
+      let ficha = null;
+      if (op.usar_ficha) ficha = await this.pedirFicha(pre);
+      this.situacao(a, 'verificando…', 'ativo'); this.status(`Verificando ${a.nome}…`);
+      const r = await pywebview.api.finalizar(pre.id, ficha, op);
+      n++; $('#progresso').style.width = (100 * n / fila.length) + '%';
+      if (r.erro) { this.situacao(a, 'falhou', 'falha'); this.toast(`${a.nome}: ${r.erro}`); continue; }
+      const ne = r.achados.filter(x => x.sev === 'ERRO').length;
+      this.situacao(a, `${r.achados.length} achado(s) · ${ne} erro`, 'ok');
+      this.resultados[r.nome] = r;
+      for (const x of r.achados) this.achados.push({...x, arquivo: r.nome, avaliacao: '', observacao: ''});
+      this.desenharResultado();
+      if ((r.avisos || []).length) this.toast(r.avisos.join(' '));
+    }
+    this.rodando = false; $('#bt-verificar').disabled = false; this.desenharArquivos();
+    this.status(`Concluído: ${Object.keys(this.resultados).length} arquivo(s), ${this.achados.length} achado(s).`);
+  },
+
+  pedirFicha(pre) {
+    return new Promise(resolve => {
+      const f = pre.ficha || {};
+      $('#f-nome').textContent = pre.nome + (pre.operacao ? ` · operação ${pre.operacao}` : '');
+      const av = $('#f-aviso');
+      av.style.display = pre.ld ? 'none' : 'block';
+      av.textContent = pre.ld ? '' : 'Nenhuma LD encontrada para esta operação: a conferência com a LD não será feita. Indique o arquivo no campo “LD do projeto”.';
+      $('#f-campos').innerHTML = this.campos.map(c => `
+        <div class="fcampo"><span class="rot">${esc(c.rotulo)}
+          <span class="info-i" tabindex="0">i<span class="tip">${esc(c.ajuda)}</span></span></span>
+          ${c.id === 'esquema_revisao'
+            ? `<select data-c="${c.id}"><option value=""></option><option value="alfabetico">alfabético (0, A, B…)</option><option value="numerico">numérico (0, 1, 2…)</option></select>`
+            : c.id === 'ld'
+              ? `<span class="comld"><input type="text" data-c="ld" value="${esc(f.ld || (pre.ld ? pre.ld.caminho : ''))}"><button class="btn peq" type="button" id="f-ld">Escolher…</button></span>`
+              : `<input type="text" data-c="${c.id}" value="${esc(f[c.id] || '')}">`}
+        </div>`).join('');
+      const sel = document.querySelector('[data-c=esquema_revisao]'); if (sel) sel.value = f.esquema_revisao || '';
+      const bl = $('#f-ld'); if (bl) bl.onclick = async () => { const p = await pywebview.api.escolher_ld(); if (p) document.querySelector('[data-c=ld]').value = p; };
+      const dlg = $('#dlg-ficha');
+      const fim = valor => { dlg.close(); $('#f-ok').onclick = $('#f-sem').onclick = dlg.oncancel = null; resolve(valor); };
+      $('#f-ok').onclick = () => { const v = {}; document.querySelectorAll('[data-c]').forEach(e => v[e.dataset.c] = e.value); fim(v); };
+      $('#f-sem').onclick = () => fim(null);
+      dlg.oncancel = e => { e.preventDefault(); fim(null); };
+      dlg.showModal();
+      const primeiro = document.querySelector('#f-campos input'); if (primeiro) primeiro.focus();
+    });
+  },
+
+  desenharResultado() {
+    const erro = this.achados.filter(a => a.sev === 'ERRO').length;
+    $('#k-total').textContent = this.achados.length; $('#k-erro').textContent = erro;
+    $('#k-aten').textContent = this.achados.length - erro;
+    const na = Object.keys(this.resultados).length;
+    $('#k-arq').textContent = `em ${na} arquivo(s)`;
+    const vis = this.achados.map((a, k) => [a, k]).filter(([a]) => this.filtro === 'todos' || a.sev === this.filtro);
+    $('#corpo').innerHTML = vis.length ? vis.map(([a, k]) => `
+      <tr data-k="${k}" class="${this.sel === k ? 'sel' : ''}">
+        <td class="arqcol" title="${esc(a.arquivo)}">${esc(a.arquivo)}</td><td class="cod">${esc(a.indice)}</td>
+        <td class="num">${a.folha}</td><td><span class="sev ${a.sev}">${a.sev === 'ATENCAO' ? 'ATENÇÃO' : 'ERRO'}</span></td>
+        <td class="cod">${esc(a.regra)}</td><td class="txt">${esc(a.texto)}</td><td class="num">${a.ocorrencias}</td>
+        <td><select data-av="${k}" aria-label="Avaliação"><option value="">—</option>
+          <option ${a.avaliacao === 'procede' ? 'selected' : ''}>procede</option>
+          <option ${a.avaliacao === 'não procede' ? 'selected' : ''}>não procede</option></select></td></tr>`).join('')
+      : `<tr><td colspan="8" class="vazio-res">${this.achados.length ? 'Nenhum achado neste filtro.' : 'Nenhum achado.'}</td></tr>`;
+  },
+  selecionar(k) {
+    this.sel = k; const a = this.achados[k];
+    document.querySelectorAll('#corpo tr').forEach(tr => tr.classList.toggle('sel', +tr.dataset.k === k));
+    $('#detalhe').innerHTML = `<div class="meta">${esc(a.arquivo)} · ${esc(a.indice)} · folha ${a.folha} · ${a.sev === 'ATENCAO' ? 'ATENÇÃO' : 'ERRO'} · ${esc(a.regra)}</div>
+      ${esc(a.texto)}<div style="margin-top:6px"><input type="text" id="obs" placeholder="Observação da avaliação (opcional)" value="${esc(a.observacao)}"></div>`;
+    $('#obs').oninput = e => a.observacao = e.target.value;
+  },
+  resultadoAtual() {
+    const a = this.sel !== null ? this.achados[this.sel] : null;
+    const nomes = Object.keys(this.resultados);
+    return a ? this.resultados[a.arquivo] : (nomes.length ? this.resultados[nomes[nomes.length - 1]] : null);
+  },
+};
+
+// eventos
+$('#bt-add').onclick = async () => app.incluir(await pywebview.api.escolher_pdfs());
+$('#bt-limpar').onclick = () => { if (!app.rodando) { app.arquivos = []; app.desenharArquivos(); } };
+$('#lista').onclick = e => { const b = e.target.closest('.x'); if (b && !app.rodando) { app.arquivos.splice(+b.dataset.k, 1); app.desenharArquivos(); } };
+$('#bt-ld').onclick = async () => { const p = await pywebview.api.escolher_ld(); if (p) $('#ld').value = p; };
+$('#bt-saida').onclick = async () => { const p = await pywebview.api.escolher_pasta(); if (p) $('#saida').value = p; };
+$('#bt-verificar').onclick = () => app.verificar();
+document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => {
+  app.filtro = b.dataset.f; document.querySelectorAll('[data-f]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  app.desenharResultado(); });
+$('#corpo').onclick = e => { const tr = e.target.closest('tr[data-k]'); if (tr && e.target.tagName !== 'SELECT') app.selecionar(+tr.dataset.k); };
+$('#corpo').ondblclick = e => { const tr = e.target.closest('tr[data-k]'); if (tr) { app.selecionar(+tr.dataset.k); $('#bt-pdf').click(); } };
+$('#corpo').onchange = e => { if (e.target.dataset.av !== undefined) app.achados[+e.target.dataset.av].avaliacao = e.target.value; };
+$('#bt-pdf').onclick = () => { const r = app.resultadoAtual(); if (r) pywebview.api.abrir(r.saida); };
+$('#bt-relatorio').onclick = () => { const r = app.resultadoAtual(); if (!r) return;
+  if (r.html) pywebview.api.abrir(r.html);
+  else app.toast('O relatório HTML não foi gravado para este arquivo (opção "Relatório HTML" desligada).'); };
+$('#bt-pasta').onclick = () => { const r = app.resultadoAtual(); if (r) pywebview.api.abrir_pasta(r.saida); };
+$('#bt-avaliacao').onclick = async () => {
+  const linhas = app.achados.filter(a => a.avaliacao || a.observacao);
+  const r = await pywebview.api.salvar_avaliacao(linhas);
+  app.toast(r.erro ? r.erro : `Avaliação salva em ${r.caminho}`); };
+// realce da área de soltar (o arquivo em si é recebido pelo Python, com o caminho completo)
+const zona = $('#soltar');
+['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); zona.classList.add('ativo'); }));
+['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { if (ev === 'drop') e.preventDefault(); if (ev === 'drop' || !e.relatedTarget) zona.classList.remove('ativo'); }));
+window.addEventListener('pywebviewready', () => app.iniciar());
+</script>
+</body>
+</html>

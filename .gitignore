@@ -1,0 +1,19 @@
+# Documentos confidenciais — nunca versionar
+referencias/
+*.pdf
+*.PDF
+*.ficha.json
+*_CEV*.csv
+*.revisao.json
+*_revisao/
+
+# Python / PyInstaller
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+*.spec
+
+# resultados de teste (contêm trechos dos documentos)
+saida_teste/

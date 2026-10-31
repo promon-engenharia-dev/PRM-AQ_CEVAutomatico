@@ -1,0 +1,2242 @@
+{
+  "versao": "0.2-rascunho",
+  "observacao": "Rascunho para aprovacao. Nenhuma regra ativa ate ser validada contra os CEVs de referencia. Textos de comentario usam {campo} para substituicao.",
+  "anotacao": {
+    "autor": "Verificador Automático",
+    "cor_rgb": [
+      1,
+      0,
+      0
+    ],
+    "cores_proibidas_comentario": "Somente vermelho. Amarelo, azul e verde representam atos de pessoas (PEG0005 6.4.2 / 7.3).",
+    "seta": {
+      "ativa": true,
+      "observacao": "Seta separada da caixa: no PDF-XChange a linha do callout da caixa nao apareceu para a usuaria (23/10/2026).",
+      "subtype": "Line",
+      "subj": "Seta",
+      "it": "LineArrow",
+      "bs_largura": 2,
+      "le": [
+        "None",
+        "OpenArrow"
+      ]
+    },
+    "texto_explicativo": {
+      "subtype": "FreeText",
+      "subj": "Texto Explicativo",
+      "it": "FreeTextCallout",
+      "fundo_rgb": [
+        1,
+        1,
+        1
+      ],
+      "da": "1 0 0 rg /F1 10 Tf",
+      "ds": "font-family:Arial Narrow;font-size:10pt;color:#FF0000;",
+      "le": "OpenArrow",
+      "largura_max_mm": 60
+    },
+    "tag_comentario": {
+      "formato": "CV-{especialidade}-{indice:03d}",
+      "especialidade": "AQ",
+      "ordem_indice": "folha, depois de cima para baixo e da esquerda para a direita",
+      "codigo_regra_no_texto": false,
+      "codigo_regra_em_nm": true
+    },
+    "marcacao_trecho": {
+      "modo_achado_com_regiao": "retangulo_translucido",
+      "modo_achado_pontual": "faixa_translucida",
+      "modos_possiveis": [
+        "faixa_translucida",
+        "retangulo_translucido",
+        "nuvem",
+        "so_seta"
+      ],
+      "nuvem": {
+        "subtype": "Polygon",
+        "subj": "Nuvem",
+        "it": "PolygonCloud",
+        "cor_rgb": [
+          1,
+          0,
+          0
+        ],
+        "be": {
+          "S": "C",
+          "I": 1
+        },
+        "bs_largura": 1,
+        "preenchimento": null,
+        "folga_mm": 2
+      },
+      "faixa": {
+        "subj": "Linha",
+        "opacidade": 0.4,
+        "espessura_relativa": 1.0,
+        "espessura_min_pt": 4
+      },
+      "retangulo": {
+        "subj": "Retângulo",
+        "opacidade": 0.25,
+        "bs_largura": 1.5
+      },
+      "observacao": "Pedido da usuaria (23/10/2026): faixa vermelha translucida sobre o texto errado; retangulo vermelho translucido em volta de areas. Nuvem continua disponivel."
+    },
+    "agrupar_entre_folhas": false,
+    "sufixo_ocorrencias": " ({n} ocorrências nesta folha)",
+    "max_setas_por_achado": 12,
+    "observacao_redundancia": "Pedido da usuaria (23/10/2026): marcar todas as ocorrencias de uma falha; cada folha recebe a propria caixa."
+  },
+  "filtros": {
+    "anotacoes_ignorar_por_autor": [
+      "AutoCAD SHX Text"
+    ],
+    "conteudo": {
+      "descricao": "Texto do conteudo da pagina que NAO pertence ao documento original (comentarios achatados de CEVs anteriores, carimbo de verificacao, assinatura digital).",
+      "regex_texto_ignorar": [
+        "^Assinado digitalmente por",
+        "^Cópia de Verificação$",
+        "^Verificação da Correção$",
+        "^(AÇÃO|VISTO|Correção|Verificação)$"
+      ],
+      "fontes_ignorar": [
+        "Calibri-Bold"
+      ],
+      "cores_ignorar": [
+        "ff0000",
+        "ef5350",
+        "0000ff",
+        "1646e9",
+        "00ff00",
+        "ffff00",
+        "1f4e79"
+      ],
+      "tolerancia_cor": 12,
+      "tamanho_min_pt": 1.5,
+      "ignorar_areas_de_anotacoes_existentes": true
+    }
+  },
+  "nome_arquivo": {
+    "regex_ja_e_cev": "_CEV\\d*$",
+    "sufixo_saida": "_CEV",
+    "sufixo_saida_se_ja_cev": "_auto",
+    "regex_revisao": [
+      "_R(?P<rev>[0-9A-Z]{1,2})(?:_CEV\\d*)?$",
+      "-P_(?P<rev>[A-Z0-9]{1,2})(?:_CEV\\d*)?$",
+      "_(?P<rev>[A-Z0-9]{1,2})(?:_CEV\\d*)?$"
+    ],
+    "csv_separador": ";",
+    "csv_encoding": "utf-8-sig"
+  },
+  "unidades": {
+    "pt_para_mm": 0.352778,
+    "razao_altura_maiuscula": {
+      "padrao": 0.716,
+      "ArialMT": 0.716,
+      "ArialNarrow": 0.716,
+      "Helvetica": 0.718
+    },
+    "observacao": "Razao a calibrar com as alturas nominais do template (Q2)."
+  },
+  "ficha": {
+    "arquivo_sufixo": ".ficha.json",
+    "campos": [
+      "numero_documento",
+      "revisao",
+      "descricao_revisao",
+      "data",
+      "titulo",
+      "cliente_operacao",
+      "executado",
+      "verificado",
+      "aprovado",
+      "total_folhas",
+      "esquema_revisao",
+      "classe_documento",
+      "ld"
+    ],
+    "deducao_automatica": {
+      "classe_documento_regex": [
+        "-[A-Z]{3}-(?P<classe>[A-Z]{2})-\\d{4}$",
+        "^\\d{4}-[A-Z]{3}-(?P<classe>[A-Z]{3})-\\d{4}$"
+      ],
+      "classes_prancha": [
+        "DE",
+        "DES"
+      ],
+      "classes_relatorio": [
+        "MF",
+        "MD",
+        "PL",
+        "ET",
+        "RL",
+        "CP",
+        "LD"
+      ],
+      "esquema_revisao": "letra => alfabetico; numero >= 1 => numerico; rev 0 => perguntar no formulario",
+      "classe_por_assunto": {
+        "regex": "^E\\.[A-Z]{4}\\d{3}(?:\\.\\d)?-(?P<assunto>[A-Z]{2}\\d)-\\d{5}$",
+        "mapa": {
+          "AQ1": "CP",
+          "AQ2": "DE",
+          "AQ3": "DE",
+          "AQ4": "DE",
+          "AQ5": "DE",
+          "AQ8": "ET"
+        },
+        "observacao": "Numeração Promon E.<operação>-<assunto>-<seq>: o assunto (PEG0007, tabela de assuntos da AQ) diz o tipo. AQ1 critérios de projeto; AQ2 conceitual, AQ3 básico, AQ4 executivo (desenhos gerais); AQ5 detalhes; AQ8 especificações e memoriais. AQ6 (aprovação em órgãos públicos), AQ7 (listas e planilhas) e AQ9 (avaliação técnica) ficam sem classe."
+      }
+    },
+    "campos_pendentes_confirmacao": [
+      "esquema_revisao",
+      "classe_documento"
+    ],
+    "rotulos": {
+      "numero_documento": "Número do documento",
+      "revisao": "Revisão",
+      "descricao_revisao": "Descrição da revisão",
+      "data": "Data",
+      "titulo": "Título",
+      "cliente_operacao": "Cliente / operação",
+      "executado": "Executado",
+      "verificado": "Verificado",
+      "aprovado": "Aprovado",
+      "total_folhas": "Total de folhas",
+      "esquema_revisao": "Esquema de revisão",
+      "classe_documento": "Classe do documento",
+      "ld": "LD do projeto (.xlsx)"
+    },
+    "ajuda": {
+      "numero_documento": "Número completo do documento, exatamente como deve sair no carimbo (campo NÚMERO DESENHO / Número Cliente). Ex.: 3-N-T012-0503-B-ARQ-DE-0001",
+      "revisao": "Revisão desta emissão, como deve aparecer no carimbo. Ex.: 0, A, B... ou 0, 1, 2... conforme o esquema da operação.",
+      "descricao_revisao": "Texto da descrição da revisão atual no histórico do carimbo. Na primeira emissão: EMISSÃO INICIAL.",
+      "data": "Data desta revisão, no formato DD/MM/AAAA (conforme planejamento).",
+      "titulo": "Título completo do documento, igual à Lista de Documentos (LD). Use uma linha por linha do carimbo ou escreva tudo seguido.",
+      "cliente_operacao": "Identificação do cliente/operação no carimbo (campo LOCAL no modelo Promon). Deixe vazio se o modelo de carimbo não tiver esse campo.",
+      "executado": "Sigla de quem elaborou o documento (coluna EXECUTADO / Des. do histórico).",
+      "verificado": "Sigla de quem efetivamente verificou o documento (coluna VERIFICADO / Ver.). Não pode ser a mesma do executado (PEG0005 6.3).",
+      "aprovado": "Sigla do supervisor da disciplina em nome do qual foi recolhida a ART (coluna APROVADO / Aprov.).",
+      "total_folhas": "Número total de folhas do documento (o 'y' de 'Folha x / y'). Pode ser maior que o número de páginas deste PDF.",
+      "esquema_revisao": "alfabetico = 0, A, B, C... (padrão do PEG0007 9.4.4). numerico = 0, 1, 2... (só se previsto no procedimento da operação). Preenchido automaticamente quando dá para deduzir.",
+      "classe_documento": "Tipo do documento, tirado do número: DE/DES = desenho/prancha; MF, MD, PL, ET, RL = documentos de texto. Define quais regras rodam. Preenchido automaticamente.",
+      "ld": "Lista de Documentos do projeto (planilha padrão Promon, aba 'LD - Promon'). Usada para conferir os Documentos de Referência e o número/título do carimbo, e para pré-preencher esta ficha. Se ficar vazio, a ferramenta procura um arquivo '*-PL2-*.xlsx' na pasta do PDF e nas pastas acima, e lembra o último arquivo usado em cada operação."
+    }
+  },
+  "carimbo": {
+    "modelos": [
+      {
+        "nome": "Promon-PT",
+        "descricao": "Carimbo Promon/RUMO em portugues (3-N-T012..., 1-P-T015... com pagina girada).",
+        "rotulos_identificacao": [
+          "NÚMERO DESENHO:",
+          "REV:",
+          "FOLHA:",
+          "ESCALA:",
+          "TÍTULO:"
+        ],
+        "minimo_rotulos": 4,
+        "campos": {
+          "numero_documento": {
+            "rotulo": "NÚMERO DESENHO:",
+            "posicao": "abaixo"
+          },
+          "numero_promon": {
+            "rotulo": "NÚMERO DESENHO PROMON:",
+            "posicao": "abaixo"
+          },
+          "revisao": {
+            "rotulo": [
+              "REV:",
+              "REV."
+            ],
+            "posicao": "abaixo"
+          },
+          "folha": {
+            "rotulo": "FOLHA:",
+            "posicao": "abaixo"
+          },
+          "escala": {
+            "rotulo": "ESCALA:",
+            "posicao": "abaixo"
+          },
+          "titulo": {
+            "rotulo": "TÍTULO:",
+            "posicao": "abaixo",
+            "multilinha": true
+          },
+          "arquivo_magnetico": {
+            "rotulo": "ARQ. MAGNÉTICO:",
+            "posicao": "abaixo"
+          },
+          "cliente_operacao": {
+            "rotulo": "LOCAL:",
+            "posicao": "abaixo"
+          },
+          "projeto": {
+            "rotulo": "PROJETO",
+            "posicao": "direita"
+          },
+          "desenho": {
+            "rotulo": "DESENHO",
+            "posicao": "direita"
+          },
+          "verificado": {
+            "rotulo": "VERIFICADO",
+            "posicao": "direita"
+          },
+          "aprovado": {
+            "rotulo": "APROVADO",
+            "posicao": "direita"
+          }
+        },
+        "historico": {
+          "colunas": [
+            {
+              "rotulo": "REVISÃO",
+              "coluna": "revisao"
+            },
+            {
+              "rotulo": "DATA",
+              "coluna": "data"
+            },
+            {
+              "rotulo": "DESCRIÇÃO",
+              "coluna": "descricao"
+            },
+            {
+              "rotulo": "EXECUTADO",
+              "coluna": "executado"
+            },
+            {
+              "rotulo": "VERIFICADO",
+              "coluna": "verificado"
+            },
+            {
+              "rotulo": "APROVADO",
+              "coluna": "aprovado"
+            }
+          ],
+          "sentido_linhas": "acima_do_cabecalho"
+        },
+        "rotulos_delimitadores": [
+          "AS INFORMAÇÕES DESTE DOCUMENTO"
+        ]
+      },
+      {
+        "nome": "Cliente-BIL-6110",
+        "descricao": "Carimbo bilingue do cliente (6110/7610/7210-AQT-DES-...). Rotulos em italico sao do proprio modelo.",
+        "rotulos_identificacao": [
+          "Título do desenho",
+          "No. do desenho",
+          "Número Cliente",
+          "Folha",
+          "Escala /",
+          "Revisão /"
+        ],
+        "rotulos_delimitadores": [
+          "No. da Área",
+          "Identificação do empreendimento",
+          "Escala gráfica",
+          "Eng. responsável",
+          "CREA (",
+          "Rev. Cliente",
+          "CAD FILE",
+          "SAVED:",
+          "Número PROMON",
+          "AS INFORMAÇÕES DESTE DOCUMENTO"
+        ],
+        "minimo_rotulos": 4,
+        "campos": {
+          "numero_documento": {
+            "rotulo": "Número Cliente",
+            "posicao": "abaixo",
+            "prefixo": true
+          },
+          "numero_promon": {
+            "rotulo": [
+              "No. do desenho",
+              "Número PROMON"
+            ],
+            "posicao": "abaixo",
+            "prefixo": true
+          },
+          "revisao": {
+            "rotulo": "Revisão / Revision",
+            "posicao": "abaixo",
+            "prefixo": true
+          },
+          "revisao_cliente": {
+            "rotulo": "Rev. Cliente",
+            "posicao": "abaixo",
+            "prefixo": true
+          },
+          "folha": {
+            "rotulo": "Folha",
+            "posicao": "abaixo",
+            "prefixo": true
+          },
+          "escala": {
+            "rotulo": "Escala /",
+            "posicao": "abaixo",
+            "prefixo": true
+          },
+          "titulo": {
+            "rotulo": "Título do desenho",
+            "posicao": "abaixo",
+            "prefixo": true,
+            "multilinha": true
+          }
+        },
+        "historico": {
+          "colunas": [
+            {
+              "rotulo": "Rev.",
+              "coluna": "revisao"
+            },
+            {
+              "rotulo": "Data",
+              "coluna": "data"
+            },
+            {
+              "rotulo": "Des.",
+              "coluna": "executado"
+            },
+            {
+              "rotulo": "Ver.",
+              "coluna": "verificado"
+            },
+            {
+              "rotulo": "Aprov.",
+              "coluna": "aprovado"
+            },
+            {
+              "rotulo": "Descrição",
+              "coluna": "descricao"
+            },
+            {
+              "rotulo": "Emissão",
+              "coluna": "finalidade"
+            }
+          ],
+          "sentido_linhas": "acima_do_cabecalho"
+        }
+      }
+    ],
+    "janela_valor_pt": 26,
+    "tamanho_min_valor_pt": 5.0,
+    "gap_max_historico_pt": 24,
+    "regex_data": "^\\d{2}/\\d{2}/(\\d{2}|\\d{4})$",
+    "campos_obrigatorios": [
+      "numero_documento",
+      "revisao",
+      "folha",
+      "escala",
+      "titulo"
+    ],
+    "colunas_obrigatorias_ultima_revisao": [
+      "revisao",
+      "data",
+      "descricao",
+      "executado",
+      "verificado",
+      "aprovado"
+    ],
+    "comparacao": {
+      "ignorar_caixa": true,
+      "colapsar_espacos": true,
+      "ignorar_acentos_na_comparacao": false,
+      "formato_data": "%d/%m/%Y"
+    },
+    "arquivo_magnetico": {
+      "regex": "^(?P<numero>.+?)[_-]R(?P<rev>[0-9A-Z]{1,2})(\\.(dwg|rvt|dgn))?$"
+    }
+  },
+  "tabelas_deteccao": {
+    "janela_cabecalho_pt": 40,
+    "gap_fim_pt": 20,
+    "distancia_pilha_pt": 150,
+    "extensao_esquerda_pt": 160,
+    "modelos_faixa_lateral_sem_tabelas": [
+      "Cliente-BIL-6110"
+    ]
+  },
+  "revisao": {
+    "esquemas": {
+      "alfabetico": {
+        "primeira": "0",
+        "sequencia": [
+          "0",
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "I",
+          "J",
+          "K",
+          "L",
+          "M",
+          "N",
+          "O",
+          "P",
+          "Q",
+          "R",
+          "S",
+          "T",
+          "U",
+          "V",
+          "W",
+          "X",
+          "Y",
+          "Z"
+        ]
+      },
+      "numerico": {
+        "primeira": "0",
+        "regex": "^\\d{1,2}$"
+      }
+    },
+    "aceitar_sufixos_intermediarios": [
+      "0A",
+      "0B"
+    ],
+    "descricao_rev0": "EMISSÃO INICIAL",
+    "descricoes_genericas": [
+      "REVISÃO",
+      "REVISAO",
+      "-",
+      "--",
+      "ALTERAÇÕES",
+      "GERAL"
+    ]
+  },
+  "titulo": {
+    "similaridade_minima": 0.6,
+    "mapa_vistas": {
+      "PLANTA": [
+        "PLANTA BAIXA",
+        "PLANTA DE COBERTURA",
+        "PLANTA COBERTURA",
+        "PLANTA DE FORRO",
+        "PLANTA DE LAYOUT"
+      ],
+      "CORTE": [
+        "CORTE"
+      ],
+      "ELEVAÇÃO": [
+        "ELEVAÇÃO",
+        "FACHADA"
+      ],
+      "PERSPECTIVA": [
+        "PERSPECTIVA",
+        "VISTA 3D",
+        "ISOMÉTRICA"
+      ],
+      "DETALHE": [
+        "DETALHE",
+        "DET."
+      ],
+      "AMPLIAÇÃO": [
+        "AMPLIAÇÃO"
+      ]
+    }
+  },
+  "regras": {
+    "PRA-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "aplica_classes": [
+        "DE"
+      ],
+      "blocos_obrigatorios": {
+        "PLANTA-CHAVE": [
+          "PLANTA-CHAVE",
+          "PLANTA CHAVE",
+          "KEY PLAN",
+          "PLANTA DE SITUAÇÃO",
+          "PLANTA DE SITUACAO",
+          "PLANT SITUATION"
+        ],
+        "NOTAS GERAIS": [
+          "NOTAS GERAIS",
+          "NOTAS /",
+          "NOTAS:",
+          "GENERAL NOTES"
+        ],
+        "DOCUMENTOS DE REFERÊNCIA": [
+          "DOCUMENTOS DE REFERÊNCIA",
+          "REFERENCE DRAWINGS",
+          "REFERENCE DOCUMENTS"
+        ]
+      },
+      "escopo": "documento",
+      "comentario": "Incluir {bloco} na folha.",
+      "observacao": "28/10/2026: no modelo de folha E.* a planta-chave se chama 'Planta de Situacao / Plant Situation'",
+      "regex_edificacao": "^A\\s*=\\s*\\d",
+      "status_teste": "em teste (23/10/2026): 0 achados nos docs de edificacao (todos tem os 3 blocos)"
+    },
+    "PRA-02": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "legenda": {
+        "rotulos": [
+          "LEGENDA",
+          "LEGENDA DE FECHAMENTOS"
+        ],
+        "so_se_tabela": "TABELA DE PAREDES E FECHAMENTOS"
+      },
+      "comentario": "Incluir Legenda de Fechamentos."
+    },
+    "PRA-03": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "norte": {
+        "gatilho_titulo_vista": "^PLANTA BAIXA",
+        "marcadores_texto": [
+          "^NV$",
+          "^NP$",
+          "^N$",
+          "NORTE"
+        ]
+      },
+      "comentario": "Incluir orientação do Norte junto à planta baixa."
+    },
+    "PRA-04": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "escopo": "documento",
+      "vistas_obrigatorias": [
+        {
+          "nome": "Planta Baixa",
+          "regex": "^PLANTA BAIXA",
+          "minimo": 1
+        },
+        {
+          "nome": "Planta de Cobertura",
+          "regex": "^PLANTA (DE )?COBERTURA",
+          "minimo": 1
+        },
+        {
+          "nome": "Cortes (transversal e longitudinal)",
+          "regex": "^CORTE\\b",
+          "minimo": 2
+        },
+        {
+          "nome": "Elevações",
+          "regex": "^(ELEVAÇÃO|FACHADA)",
+          "minimo": 1
+        },
+        {
+          "nome": "Perspectiva 3D",
+          "regex": "^(PERSPECTIVA|VISTA 3D)",
+          "minimo": 1
+        }
+      ],
+      "comentario": "Não encontrei {vista} no documento. Confirmar se está em outro documento da LD."
+    },
+    "PRA-05": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "requer_ficha": true,
+      "comentario": "Folha {x}/{y}: o total deve corresponder ao total de folhas do documento ({total_ficha}).",
+      "status_teste": "em teste (23/10/2026): ficha - sem teste com ficha real"
+    },
+    "PRA-06": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "{detalhe}",
+      "comentarios": {
+        "total_menor": "Folha {x}/{y}: o PDF tem {n} folhas — o total não pode ser menor.",
+        "x_maior": "Folha {x}/{y}: número da folha maior que o total.",
+        "totais_diferentes": "Total de folhas diferente entre as folhas do documento ({totais}).",
+        "sequencia": "Numeração de folha fora de sequência: esperado {esperado}, encontrado {x}."
+      },
+      "status_teste": "em teste (23/10/2026): 5 docs; 6110-0010 e 7610-0005 batem com seus comentarios"
+    },
+    "PRA-07": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "folha": {
+        "regex": "^\\s*(?:FL\\.?\\s*)?(?P<x>\\d{1,3})\\s*/\\s*(?P<y>\\d{1,3})\\s*$",
+        "regex_formato_ok": "^(FL\\.?\\s*)?\\d{2,3}\\s*/\\s*\\d{2,3}$",
+        "formato_padrao": "{x:02d} / {y:02d}"
+      },
+      "comentario": "Ajustar formato da folha para \"{formato}\".",
+      "status_teste": "em teste (23/10/2026): 1 achado"
+    },
+    "PRA-08": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "referencias": {
+        "regex_citacao": "/\\s*(?P<n>\\d{1,2})\\s*/",
+        "regex_item": "^\\s*(?P<n>\\d{1,2})[.)]\\s*$",
+        "bloco": "DOCUMENTOS DE REFERÊNCIA",
+        "regex_nota": "NOTAS?\\s*(GERAL|GERAIS)?\\s*(N[º°O.]\\s*)?$"
+      },
+      "comentario": "Referência /{n}/ citada, mas não consta na lista de Documentos de Referência.",
+      "status_teste": "em teste (23/10/2026): 0 achados em 40 docs (sem ruido, sem acerto)",
+      "comentario_nota": "Nota /{n}/ citada, mas as Notas Gerais desta folha vão até o item {max}."
+    },
+    "PRA-09": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "referencias": {
+        "regex_codigo_documento": "\\b(?:\\d-[A-Z]-[A-Z]\\d{3}-\\d{4}-[A-Z]-[A-Z]{3}-[A-Z]{2}-\\d{4}|E\\.[A-Z]{4}\\d{3}(?:\\.\\d)?-[A-Z]{2}\\d-\\d{5}|\\d{4}-[A-Z]{3}-[A-Z]{3}-\\d{4})\\b"
+      },
+      "comentario": "Itens {i} e {j} dos Documentos de Referência têm o mesmo código ({codigo}).",
+      "status_teste": "em teste (23/10/2026): 1 achado = seu comentario"
+    },
+    "PRA-11": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "remissao_folha": {
+        "regex": "\\bFL\\.?\\s*0*(?P<n>\\d{1,3})\\b",
+        "total_de": "ficha.total_folhas"
+      },
+      "comentario": "Remissão a {codigo}, mas o documento tem {total} folha(s)."
+    },
+    "PRA-10": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "placeholders": {
+        "regex": [
+          "\\bX{2,}\\b",
+          "\\bxx\\b",
+          "/\\s*X\\s*/",
+          "\\b[A-Z]{2,3}X{2,3}\\b",
+          "\\bA DEFINIR\\b",
+          "\\?{2,}"
+        ]
+      },
+      "comentario": "Texto provisório \"{texto}\" — preencher ou confirmar se deve permanecer.",
+      "status_teste": "em teste (23/10/2026): placeholders reais em 2 docs"
+    },
+    "CAR-00": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "comentario": "Carimbo não reconhecido — campos do carimbo não verificados automaticamente.",
+      "comentario_historico": "Histórico de revisões não reconhecido — revisões não verificadas automaticamente.",
+      "status_teste": "em teste (23/10/2026): informativo"
+    },
+    "CAR-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Preencher campo \"{campo}\" do carimbo.",
+      "comentario_historico": "Preencher \"{coluna}\" da revisão {rev} no histórico.",
+      "status_teste": "em teste (23/10/2026): campos vazios reais"
+    },
+    "CAR-02": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "requer_ficha": true,
+      "campos_comparados": [
+        "numero_documento",
+        "revisao",
+        "descricao_revisao",
+        "data",
+        "titulo",
+        "cliente_operacao",
+        "executado",
+        "verificado",
+        "aprovado"
+      ],
+      "comentario": "{campo}: \"{valor_pdf}\" — esperado \"{valor_ficha}\".",
+      "status_teste": "em teste (23/10/2026): ficha - sem teste com ficha real"
+    },
+    "CAR-03": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Revisão do carimbo ({rev_carimbo}) difere da revisão no nome do arquivo ({rev_arquivo}).",
+      "comentario_numero": "Número do documento no carimbo ({numero_carimbo}) difere do nome do arquivo ({numero_arquivo}).",
+      "status_teste": "em teste (23/10/2026): 4 docs, todos reais"
+    },
+    "CAR-04": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Revisão do carimbo ({rev_carimbo}) difere da última revisão do histórico ({rev_historico}).",
+      "status_teste": "em teste (23/10/2026): 0 achados"
+    },
+    "CAR-05": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Histórico de revisões fora de sequência: {detalhe}.",
+      "status_teste": "em teste (23/10/2026): 0 achados"
+    },
+    "CAR-06": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "requer_ficha": true,
+      "comentario": "Revisão \"{rev}\" fora do esquema {esquema} adotado na operação (PEG0007 9.4.4).",
+      "status_teste": "em teste (23/10/2026): 0 achados"
+    },
+    "CAR-07": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Descrição da revisão {rev}: usar \"EMISSÃO INICIAL\" somente na revisão 0.",
+      "similaridade_grafia": 0.8,
+      "comentario_grafia": "Corrigir grafia: \"{valor}\" → \"EMISSÃO INICIAL\".",
+      "comentario_rev0": "Revisão {rev} é a primeira emissão: descrição deve ser \"EMISSÃO INICIAL\".",
+      "status_teste": "em teste (23/10/2026): 2 grafias erradas reais"
+    },
+    "CAR-08": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "comentario": "Descrição da revisão {rev} deve informar a modificação ocorrida (PEG0007 9.4.5)."
+    },
+    "CAR-09": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Arquivo magnético \"{valor}\" não corresponde a {numero}_R{rev}.",
+      "status_teste": "em teste (23/10/2026): 0 achados"
+    },
+    "CAR-10": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Verificador não pode ser o executante do documento (PEG0005 6.3).",
+      "status_teste": "em teste (23/10/2026): 0 achados"
+    },
+    "CAR-11": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "comentario": "{campo} do carimbo ({valor_bloco}) difere da última revisão do histórico ({valor_historico})."
+    },
+    "CAR-12": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "requer_ficha_anterior": true,
+      "comentario": "Título alterado em relação à revisão anterior — mudança de título só para complementação (PEG0007 9.4.8)."
+    },
+    "CAR-13": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "comentario": "Título \"{titulo}\" deve corresponder ao conteúdo da folha (vistas encontradas: {vistas})."
+    },
+    "TAB-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "escopo": "documento",
+      "regex_titulo_tabela": "^(TABELAS? DE|QUADRO DE)\\b",
+      "obrigatorias": [
+        {
+          "nome": "Quadro de Ambientes",
+          "regex": "^QUADRO DE AMBIENTES",
+          "exigir_se": {
+            "regex_linha": "^A\\s*=\\s*\\d",
+            "tipos_vista": [
+              "PLANTA_BAIXA",
+              "PLANTA"
+            ]
+          }
+        },
+        {
+          "nome": "Quadro de Áreas",
+          "regex": "^QUADRO DE ÁREAS",
+          "exigir_se": {
+            "regex_linha": "^A\\s*=\\s*\\d",
+            "tipos_vista": [
+              "PLANTA_BAIXA",
+              "PLANTA"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Paredes e Fechamentos",
+          "regex": "^TABELAS? DE (PAREDES E )?FECHAMENTOS",
+          "exigir_se": {
+            "prefixos": [
+              "FA",
+              "FT",
+              "FD",
+              "FE",
+              "FP"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Revestimento de Parede",
+          "regex": "^TABELAS? DE REVESTIMENTOS? DE PAREDE",
+          "exigir_se": {
+            "prefixos": [
+              "RE"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Revestimento de Piso",
+          "regex": "^TABELAS? DE REVESTIMENTOS? DE PISO",
+          "exigir_se": {
+            "prefixos": [
+              "PI"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Revestimento de Teto",
+          "regex": "^TABELAS? DE (FORROS( E REVESTIMENTOS? DE TETO)?|REVESTIMENTOS? DE TETO)",
+          "exigir_se": {
+            "prefixos": [
+              "TE"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Janelas",
+          "regex": "^TABELAS? D[AE] JANELAS",
+          "exigir_se": {
+            "prefixos": [
+              "JAM",
+              "JAC",
+              "JAF",
+              "VN"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Peitoris",
+          "regex": "^TABELAS? DE PEITORI",
+          "exigir_se": {
+            "prefixos": [
+              "PL"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Portas",
+          "regex": "^TABELAS? DE PORTAS",
+          "exigir_se": {
+            "prefixos": [
+              "PAV",
+              "PT",
+              "PM",
+              "PFD",
+              "PF",
+              "PC",
+              "PE"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Soleiras",
+          "regex": "^TABELAS? DE SOLEIRAS",
+          "exigir_se": {
+            "prefixos": [
+              "SL"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Coberturas",
+          "regex": "^TABELAS? DE COBERTURA",
+          "exigir_se": {
+            "prefixos": [
+              "CO"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Calhas e Rufos",
+          "regex": "^TABELAS? DE CALHAS E RUFOS",
+          "exigir_se": {
+            "prefixos": [
+              "CP"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Tubulação de Água Pluvial",
+          "regex": "^TABELAS? DE TUBULAÇÃO DE ÁGUA PLUVIAL",
+          "exigir_se": {
+            "prefixos": [
+              "TQ"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Bancadas",
+          "regex": "^TABELAS? DE (BALCÕES E )?BANCADAS",
+          "exigir_se": {
+            "prefixos": [
+              "BA"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Peças Sanitárias",
+          "regex": "^TABELAS? DE (PEÇAS SANITÁRIAS|EQUIPAMENTOS HIDROSSANITÁRIOS)",
+          "exigir_se": {
+            "prefixos": [
+              "HD"
+            ]
+          }
+        },
+        {
+          "nome": "Tabela de Guarda-corpo",
+          "regex": "^TABELAS? DE GUARDA",
+          "exigir_se": {
+            "prefixos": [
+              "GC"
+            ]
+          }
+        }
+      ],
+      "observacao": "Prefixo->tabela levantado dos 40 CEVs. Cada tabela so e exigida quando o desenho usa o prefixo (ou, para os quadros, quando ha TAG de ambiente 'A= ... m2').",
+      "comentario": "Incluir {tabela}.",
+      "minimo_tabelas_no_documento": 3,
+      "status_teste": "em teste (23/10/2026): 4 plausiveis",
+      "observacao_quadros": "28/10/2026 (usuária): Quadro de Ambientes e Quadro de Áreas só nas plantas gerais. Exigidos apenas quando o documento tem vista do tipo PLANTA_BAIXA ou PLANTA (não em ampliação, detalhe ou corte)."
+    },
+    "TAB-02": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "{tabela} está vazia.",
+      "status_teste": "em teste (23/10/2026): 3 reais (2 batem com seus comentarios)"
+    },
+    "TAB-03": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "quadro_areas": {
+        "termos_obrigatorios": [
+          "CONSTRU",
+          "COBERT"
+        ]
+      },
+      "comentario": "Quadro de Áreas deve conter ÁREA CONSTRUÍDA e ÁREA COBERTA.",
+      "status_teste": "em teste (23/10/2026): 3 reais"
+    },
+    "TAB-04": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "unidades": [
+        {
+          "cabecalho_regex": "\\(m²\\)|\\(m2\\)",
+          "celula_regex": "\\d\\s*m[²2]\\s*$",
+          "unidade": "m²"
+        },
+        {
+          "cabecalho_regex": "\\(m\\)",
+          "celula_regex": "\\d\\s*m\\s*$",
+          "unidade": "m"
+        },
+        {
+          "cabecalho_regex": "\\(un\\)|\\(und\\)",
+          "celula_regex": "\\d\\s*(un|und)\\.?\\s*$",
+          "unidade": "un"
+        }
+      ],
+      "comentario": "Suprimir \"{unidade}\" após o valor — a unidade já está indicada no cabeçalho.",
+      "status_teste": "em teste (23/10/2026): 25 em 14 docs; voce comentou o tema 9x"
+    },
+    "TAB-05": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ATENCAO",
+      "ordem": "mesma de TAB-01.obrigatorias",
+      "comentario": "Posicionar as tabelas na ordem do Checklist de AQ ({posicao_esperada}ª: {tabela})."
+    },
+    "KEY-00": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "comentario": "Tabelas de keynote não identificadas — cruzamento tabela × desenho não realizado.",
+      "status_teste": "em teste (23/10/2026): informativo"
+    },
+    "KEY-comum": {
+      "regex_codigo": "\\b(?P<prefixo>[A-Z]{2,3})(?P<num>\\d{2,3})\\b",
+      "cabecalho_coluna_vocabulario": [
+        "TAG",
+        "CÓDIGO"
+      ],
+      "vocabulario_minimo": 5,
+      "escopo": "documento",
+      "exclusoes": {
+        "prefixos": [
+          "NBR",
+          "NR",
+          "EL",
+          "DN",
+          "FL"
+        ],
+        "codigos": [],
+        "regex_contexto": [
+          "\\b[A-Z]{2,3}\\d{2,3}-\\d",
+          "\\b(ATLAS COPCO|SCHULZ|KAESER)\\b",
+          "\\bNBR\\s*\\d",
+          "\\b1\\s*:\\s*\\d",
+          "\\bEL\\.?\\s*\\d"
+        ],
+        "observacao": "Nao excluir siglas de UF nem PT: BA, MS e PT sao prefixos de keynote reais (BA10, MS20, PT31). Codigos do carimbo (PT01, PT11 nos GRL) sao evitados pela exclusao da area do carimbo."
+      },
+      "prefixos_sem_tag_no_desenho": [
+        "HD",
+        "MS",
+        "MA",
+        "MC",
+        "MM"
+      ],
+      "similaridade_max_descricoes": 0.6,
+      "fracao_prefixo_dominante": 0.25
+    },
+    "KEY-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "{codigo} não consta na {tabela_do_prefixo}.",
+      "status_teste": "em teste (23/10/2026): 5; 2 batem com seus comentarios. 28/10/2026: passou a rodar nos documentos E.* (classe pelo assunto do PEG0007); pegou PI11 sem linha na tabela"
+    },
+    "KEY-02": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "comentario": "{codigo} não pertence a nenhuma tabela do documento — confirmar se é keynote."
+    },
+    "KEY-03": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "comentario": "{codigo} consta na {tabela}, mas não foi encontrado nos desenhos."
+    },
+    "KEY-04": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "normalizacao_descricao": {
+        "ignorar_caixa": true,
+        "colapsar_espacos": true,
+        "ignorar_pontuacao_final": true
+      },
+      "comentario": "{codigo} aparece com descrições diferentes: \"{desc1}\" × \"{desc2}\".",
+      "status_teste": "em teste (23/10/2026): 1 (verificar)"
+    },
+    "TAG-comum": {
+      "tag_ambiente": {
+        "regex_area": "^A\\s*=\\s*(?P<valor>\\d+(?:[.,]\\d+)?)\\s*m[²2]$",
+        "regex_pd": "^P\\.?\\s*D\\.?\\s*=?\\s*\\S",
+        "raio_agrupamento_mm": 15,
+        "acabamentos_minimos": 3,
+        "normalizacao_nome": {
+          "ignorar_caixa": true,
+          "ignorar_acentos": true,
+          "colapsar_espacos": true
+        },
+        "tolerancia_area_m2": 0.01,
+        "regex_acabamento": "^[A-Z]{2,3}\\d{2,3}$",
+        "janela_pt": {
+          "lateral": 45,
+          "acima": 55,
+          "abaixo": 22
+        }
+      }
+    },
+    "TAG-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "TAG do ambiente {ambiente}: falta {item}.",
+      "comentario_agrupado": "TAGs de ambiente sem {item}: {ambientes}.",
+      "max_ambientes_listados": 6,
+      "observacao": "28/10/2026: um comentário por folha, com marca em cada TAG (pedido da usuária); com um só ambiente, usa o texto individual."
+    },
+    "TAG-02": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "comentario": "TAG do ambiente {ambiente} deve indicar os 3 acabamentos (piso, parede, teto).",
+      "comentario_agrupado": "TAGs de ambiente devem indicar os 3 acabamentos (piso, parede, teto): {ambientes}.",
+      "max_ambientes_listados": 6,
+      "observacao": "28/10/2026: um comentário por folha, com marca em cada TAG (pedido da usuária); com um só ambiente, usa o texto individual."
+    },
+    "TAG-03": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ERRO",
+      "comentario": "Ambiente \"{ambiente}\" não consta no Quadro de Ambientes."
+    },
+    "TAG-04": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ERRO",
+      "comentario": "Área do ambiente {ambiente}: TAG {area_tag} m² × Quadro {area_quadro} m²."
+    },
+    "TAG-05": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "cota_nivel": {
+        "regex_candidato": "^EL\\.?\\s*-?\\d",
+        "regex_valida": "^EL\\. -?\\d{1,4},\\d{3}$",
+        "casas_decimais": 3,
+        "exemplo": "EL. 524,740",
+        "observacao": "Formato por projeto: confirmar se 3 casas e padrao geral ou de operacao.",
+        "modo": "formato_minoritario",
+        "fracao_minoritaria": 0.2,
+        "minimo_ocorrencias": 5
+      },
+      "comentario": "Cota de nível \"{texto}\" fora do padrão \"{exemplo}\".",
+      "status_teste": "em teste (23/10/2026): 0 achados"
+    },
+    "TAG-06": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ATENCAO",
+      "cota_nivel": {
+        "qualificadores": [
+          "(ACAB.)",
+          "(CALÇADA)",
+          "(TERRAPLENAGEM)",
+          "TÉRREO",
+          "COBERTURA"
+        ],
+        "raio_mm": 6
+      },
+      "comentario": "Cota de nível sem qualificador — indicar (ACAB.), (CALÇADA) ou equivalente."
+    },
+    "TAG-07": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "cotas": {
+        "regex_cota": "^\\d{1,5}(?:,\\d)?$",
+        "fonte_cota": [
+          "ArialNarrow"
+        ],
+        "tamanho_pt_cota": [
+          8.0,
+          9.0
+        ],
+        "aceitar_decimais": false,
+        "modulo_cm": 5
+      },
+      "comentario": "Cota com valor quebrado ({valor}) — a validar pelo verificador."
+    },
+    "APR-01": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "pendente": "Q2-b",
+      "altura_texto": {
+        "alturas_permitidas_mm": [
+          1.5,
+          2.0
+        ],
+        "altura_max_carimbo_mm": 4.0,
+        "tolerancia_mm": 0.2,
+        "agrupar": "um comentario por folha e por altura",
+        "classes_avaliadas": [
+          "notas",
+          "tags",
+          "keynotes",
+          "cotas",
+          "corpo_tabela"
+        ],
+        "classes_excluidas_pendente_Q2b": [
+          "titulo_vista",
+          "titulo_bloco",
+          "bolha_eixo",
+          "nome_ambiente",
+          "titulo_tabela"
+        ]
+      },
+      "comentario": "{n} texto(s) com altura {altura} mm — padrão: 1,5 ou 2,0 mm (ex.: \"{exemplo}\")."
+    },
+    "APR-02": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "altura_destoante": {
+        "desvio_relativo": 0.2,
+        "tamanho_minimo_grupo": 5
+      },
+      "comentario": "Texto com altura diferente do restante do grupo ({altura} mm × {mediana} mm)."
+    },
+    "APR-03": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "sobreposicao": {
+        "area_minima_rel": 0.25,
+        "ignorar_mesmo_texto": true
+      },
+      "comentario": "Textos sobrepostos — ajustar para evitar conflito gráfico."
+    },
+    "APR-04": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ATENCAO",
+      "duplicado": {
+        "distancia_max_mm": 0.5
+      },
+      "comentario": "Texto \"{texto}\" duplicado na mesma posição.",
+      "max_por_pagina": 5,
+      "observacao": "Rebaixada para lote 3 no teste: duplicatas exatamente sobrepostas sao invisiveis na plotagem e nao aparecem nos seus comentarios."
+    },
+    "APR-05": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "borda": {
+        "margem_mm": -0.5
+      },
+      "comentario": "Texto cortado pela borda da folha (\"{texto}\").",
+      "observacao": "ATENCAO no teste: a caixa do texto inclui o avanço do ultimo caractere; tolerancia de 0,5 mm alem da borda.",
+      "status_teste": "em teste (23/10/2026): 1 doc"
+    },
+    "APR-06": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "severidade_perspectiva": "ATENCAO",
+      "vistas": {
+        "regex_titulo": "^(PLANTA|CORTE|ELEVAÇÃO|FACHADA|DETALHE|AMPLIAÇÃO|PERSPECTIVA|VISTA 3D)\\b",
+        "regex_perspectiva": "^(PERSPECTIVA|VISTA 3D|ISOMÉTRICA)",
+        "regex_escala": "^(ESCALA|ESC\\.?)\\s*1\\s*:\\s*\\d+|^SEM ESCALA$",
+        "distancia_escala_mm": 12,
+        "tamanho_min_titulo_pt": 14,
+        "regex_excluir": "^(PLANTA[- ]CHAVE|PLANTA CHAVE)",
+        "regex_titulo_nivel": "^(TÉRREO|COBERTURA|MEZANINO|SUBSOLO|ÁTICO|(\\d+º?|PRIMEIRO|SEGUNDO|TERCEIRO) PAVIMENTO|PAVIMENTO\b)",
+        "observacao_nivel": "Título só com o nome do nível (ex.: 'TÉRREO', 'COBERTURA', campo Title on Sheet do Revit) também é vista, desde que tenha linha de escala logo abaixo; a APR-12 aponta que o título está incompleto."
+      },
+      "comentario": "Indicar a escala da vista ({vista}).",
+      "comentario_perspectiva": "Indicar \"SEM ESCALA\" na perspectiva.",
+      "status_teste": "em teste (23/10/2026): 9; 7 batem com seus 'SEM ESCALA'"
+    },
+    "APR-07": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "escala": {
+        "valor_multiplas": [
+          "INDICADA",
+          "VARIÁVEL",
+          "AS INDICATED",
+          "AS SHOWN"
+        ]
+      },
+      "comentario": "Escala do carimbo ({escala_carimbo}) não corresponde às vistas ({escalas_vistas}).",
+      "status_teste": "em teste (23/10/2026): 1"
+    },
+    "APR-08": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "escala": {
+        "regex_candidato": "^(ESCALA|ESC\\.?)\\s*1\\s*[:/]\\s*\\d+",
+        "formato": "1 : {n}",
+        "regex_formato_ok": "1 : \\d+$"
+      },
+      "comentario": "Escrever a escala no formato \"1 : {n}\".",
+      "status_teste": "em teste (23/10/2026): 0 achados"
+    },
+    "APR-09": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ATENCAO",
+      "escala": {
+        "conjunto_usual": [
+          1,
+          2,
+          5,
+          10,
+          20,
+          25,
+          50,
+          75,
+          100,
+          125,
+          200,
+          250,
+          500,
+          1000,
+          2000,
+          5000
+        ]
+      },
+      "comentario": "Escala 1 : {n} fora do conjunto usual — confirmar."
+    },
+    "APR-10": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "fonte": {
+        "regex_italico": "(Italic|Oblique|,Italic)",
+        "flag_italico_pymupdf": 2,
+        "excluir_area_carimbo": true,
+        "italico_permitido_regex": [
+          "^[A-Z][a-z]+ [a-z]+( [a-z]+)?$",
+          "^[^A-Za-zÀ-ÿ]*$"
+        ]
+      },
+      "comentario": "Texto em itálico fora do padrão.",
+      "observacao": "Nomes cientificos (Genero especie) em italico sao convencao correta e nao sao comentados.",
+      "status_teste": "em teste (23/10/2026): 2 docs; 7610-0005 bate com seu comentario"
+    },
+    "VOC-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "escopo": "documento",
+      "grupos_sinonimos": [
+        {
+          "termos": [
+            "TERRENO",
+            "TERRAPLENAGEM"
+          ],
+          "ativo": true
+        },
+        {
+          "termos": [
+            "P.A.",
+            "PONTO ALTO"
+          ],
+          "ativo": false
+        },
+        {
+          "termos": [
+            "DET.",
+            "DETALHE"
+          ],
+          "ativo": false
+        }
+      ],
+      "observacao": "Lista inicial a partir dos CEVs; ampliar com a usuaria.",
+      "comentario": "Termos diferentes para o mesmo elemento: {termos} — adotar um único padrão.",
+      "max_palavras_linha": 4,
+      "pendente": "Modo entre documentos: o caso real (0208 TERRAPLENAGEM x 0503-1001 TERRENO) so aparece comparando PDFs diferentes da mesma operacao.",
+      "status_teste": "em teste (23/10/2026): 0 achados (ver pendente)"
+    },
+    "VOC-02": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "escopo": "documento",
+      "acentuacao": {
+        "palavras_minimas_len": 4,
+        "excecoes": [
+          "ESTA",
+          "ESTAS",
+          "PARA",
+          "PODE",
+          "SECA"
+        ],
+        "max_palavras_linha": 0
+      },
+      "comentario": "Grafia divergente: \"{forma_errada}\" × \"{forma_correta}\".",
+      "observacao": "Rebaixada para lote 2 no teste: 34 achados em 18 docs, quase todos acentos omitidos em caixa alta (NIVEL, AREA) que voce nao comenta; e sem dicionario a regra nao sabe qual forma e a correta (ex.: FERROVIA x FERROVÍA). Reavaliar junto com REL-01 (Hunspell)."
+    },
+    "VOC-03": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "niveis": {
+        "regex": "^EL\\.?\\s*(?P<valor>-?\\d+,\\d+)$",
+        "nome_acima_ou_abaixo_mm": 6
+      },
+      "comentario": "Nível EL. {valor} nomeado como {nomes} em vistas diferentes."
+    },
+    "REL-01": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ATENCAO",
+      "ortografia": {
+        "dicionario": "dic/pt_BR",
+        "glossario_tecnico": "dic/glossario_tecnico.txt",
+        "ignorar_maiusculas_ate_len": 4
+      },
+      "comentario": "Verificar grafia: \"{palavra}\"."
+    },
+    "REL-02": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ERRO",
+      "itemizacao": {
+        "regex": "^(?P<num>\\d+(?:\\.\\d+){0,4})\\.?\\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ]"
+      },
+      "comentario": "Numeração de itens quebrada: {anterior} → {atual}."
+    },
+    "REL-03": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ERRO",
+      "remissao": {
+        "regex": "\\b(?:item|itens|seção|subitem)\\s+(?P<num>\\d+(?:\\.\\d+){0,4})"
+      },
+      "comentario": "Item {item} citado não existe no documento."
+    },
+    "REL-04": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ATENCAO",
+      "legendas": {
+        "regex_legenda": "^(?P<tipo>Figura|Tabela|Quadro)\\s+(?P<n>\\d+)",
+        "regex_chamada": "\\b(?P<tipo>Figura|Tabela|Quadro)\\s+(?P<n>\\d+)"
+      },
+      "comentario": "{tipo} {n} sem chamada no texto."
+    },
+    "REL-05": {
+      "ativa": false,
+      "lote": 3,
+      "severidade": "ERRO",
+      "comentario": "Numeração duplicada: {numero}."
+    },
+    "CON-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "tipos_vista": [
+        "PLANTA_BAIXA",
+        "CORTE",
+        "ELEVACAO"
+      ],
+      "regex_presenca": [
+        "^EL\\.?\\s*[+\\-±]?\\s*\\d",
+        "^EL\\.?\\s*\\?"
+      ],
+      "comentario": "Vista sem cota de nível ({vista}) — indicar EL. dos pisos/níveis.",
+      "fonte": "CK B30, B61, B72",
+      "observacao": "28/10/2026: aceita EL. +0,34 (sinal de mais); antes so aceitava menos e gerava falso positivo no modelo de folha E.*"
+    },
+    "CON-02": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "tipos_vista": [
+        "COBERTURA"
+      ],
+      "regex_presenca": [
+        "\\d+([,.]\\d+)?\\s*%",
+        "^i\\s*="
+      ],
+      "comentario": "Indicar a inclinação (caimento) de cada água da cobertura ({vista}).",
+      "fonte": "CK B50"
+    },
+    "CON-03": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "tipos_vista": [
+        "COBERTURA"
+      ],
+      "regex_presenca": [
+        "DESCIDA",
+        "^A\\.?\\s*P\\.?$",
+        "\bTQ\\d{2}\b",
+        "TUBO DE QUEDA",
+        "CONDUTOR"
+      ],
+      "comentario": "Não encontrei indicação das descidas de água pluvial ({vista}).",
+      "fonte": "CK B54; seu comentario 8x"
+    },
+    "CON-04": {
+      "ativa": false,
+      "lote": 2,
+      "severidade": "ATENCAO",
+      "tipos_vista": [
+        "PLANTA_BAIXA",
+        "COBERTURA",
+        "PLANTA"
+      ],
+      "regex_bolha": "^([A-Z]{1,2}|\\d{1,2})$",
+      "tamanho_min_bolha_pt": 15,
+      "min_eixos": 3,
+      "regex_cota": "^\\d{2,5}([,.]\\d{1,2})?$",
+      "distancia_max_cota_pt": 160,
+      "comentario": "Falta cota entre os eixos {e1} e {e2}.",
+      "fonte": "CK B32, B69; 'Atentar-se a ordem das cotas 1) geral dos eixos 2) entre eixos'"
+    },
+    "LD-comum": {
+      "regex_codigo": "(?<![\\w.])(?:E\\.[A-Z]{4}\\d{3}(?:\\.\\d)?-[A-Z]{2}\\d-\\d{5}|[A-Z0-9]{1,8}(?:-[A-Z0-9]{1,8}){3,7})(?![\\w])",
+      "similaridade_sugestao": 0.85,
+      "observacao": "Codigo = E.XXXX000-AA0-00000 ou 4 a 8 segmentos separados por hifen (2010-AQT-CTP-0001-B, 3-N-T012-0200-B-GRL-DE-0001, FM22079-SJ-000-PB-DE-OBC-003)."
+    },
+    "LD-00": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "comentario": "A LD carregada é da operação {op_ld}, mas o documento é da {op_doc} — conferência com a LD não realizada."
+    },
+    "LD-01": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Documento {codigo} não consta na LD.",
+      "comentario_sugestao": "Documento {codigo} não consta na LD — seria {sugestao} (\"{titulo_ld}\")?"
+    },
+    "LD-02": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "comentario": "Título de {codigo} difere da LD ({diferenca}). Na LD: \"{titulo_ld}\"."
+    },
+    "LD-03": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Documento {codigo} está marcado como excluído (E) na LD."
+    },
+    "LD-04": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ERRO",
+      "comentario": "Número do documento ({numero}) não consta na LD."
+    },
+    "LD-05": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "comentario": "Título do carimbo difere da LD ({diferenca}). Na LD: \"{titulo_ld}\"."
+    },
+    "PRA-12": {
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "30/10/2026: ativa para todos os projetos (decisão da usuária). Acerta o 5420; nos 40 CEVs dispara em 26 documentos (21 de projetos antigos T015/T012, que não tinham essa prática)",
+      "severidade": "ATENCAO",
+      "aplica": "documentos com planta geral (vista PLANTA_BAIXA/PLANTA)",
+      "comentario": "Incluir planta-chave de setorização (layout/departamentos) com legenda.",
+      "observacao": "Documento de edificação com planta geral (vista PLANTA BAIXA/PLANTA) e nenhuma legenda de setorização em nenhuma folha."
+    },
+    "PRA-13": {
+      "ativa": false,
+      "lote": 2,
+      "status_teste": "30/10/2026: implementada; depende da aprovação do padrão de setorização",
+      "severidade": "ERRO",
+      "comentario": "Setor \"{setor}\": cor fora do padrão de setorização (usar {hex_padrao})."
+    },
+    "PRA-14": {
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "30/10/2026: 5 PDFs com setorização + 40 CEVs: 0 achados (todas as legendas coerentes com a planta); sem falso positivo",
+      "severidade": "ERRO",
+      "comentario": "Legenda de setorização: {detalhe}.",
+      "observacao": "cor preenchida na planta sem item na legenda, ou item da legenda sem uso na planta (comparação pelas cores dos preenchimentos vetoriais)"
+    },
+    "PRA-15": {
+      "ativa": false,
+      "lote": 2,
+      "status_teste": "30/10/2026: implementada; depende da aprovação do padrão de setorização",
+      "severidade": "ATENCAO",
+      "comentario": "Legenda: \"{nome}\" fora da lista padrão de setores — usar {sugestao}."
+    },
+    "PRA-16": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "delta_e_min": 10,
+      "comentario": "Cores muito parecidas na legenda de setorização: {pares} — usar cores bem distintas (padrão de setorização).",
+      "observacao": "Evidência: comentário 'CORES MUITO PARECIDAS' do verificador na legenda de setorização do 6110-0001 (folha 2). Diferença de cor ΔE (CIE76) entre pares de amostras da mesma legenda.",
+      "status_teste": "30/10/2026: dispara nas 6 legendas de setorização existentes (ΔE 4 a 8 entre setores); bate com o comentário 'CORES MUITO PARECIDAS' do verificador no 6110-0001"
+    },
+    "APR-12": {
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "30/10/2026: 6110-0005 B acerta TÉRREO e COBERTURA (comentários da verificadora); 40 CEVs: 16 em 8 docs, todos títulos só com o nível no modelo 6110/7610",
+      "severidade": "ATENCAO",
+      "comentario": "Título de vista incompleto: \"{titulo}\" — indicar o tipo da vista (ex.: \"{sugestao}\"; campo Title on Sheet).",
+      "sugestoes": {
+        "COBERTURA": "PLANTA DE COBERTURA",
+        "*": "PLANTA BAIXA - {titulo}"
+      },
+      "fonte": "CEV2 6110-0005: 'PLANTA BAIXA - TÉRREO (Ajustar no campo TITLE IN SHEET)', 'PLANTA DE COBERTURA (...)'"
+    },
+    "APR-13": {
+      "ativa": false,
+      "lote": 2,
+      "status_teste": "30/10/2026: acerta o 6110-0005 B, mas nos 40 CEVs dá 12 desvios de 0,5–2,6 mm em 8 docs sem comentário de verificador; fica no lote 2",
+      "severidade": "ATENCAO",
+      "desalinhamento_mm": [
+        0.5,
+        5
+      ],
+      "comentario": "Vistas desalinhadas: título de \"{a}\" está {dy} mm {lado} do título de \"{b}\" — alinhar as vistas da mesma faixa.",
+      "fonte": "CEV2 6110-0005: 'vistas desalinhadas'",
+      "tipos_vista": [
+        "PLANTA_BAIXA",
+        "PLANTA",
+        "COBERTURA",
+        "CORTE",
+        "ELEVACAO"
+      ]
+    },
+    "TAB-07": {
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "30/10/2026: 6110-0005 B acerta a tabela encoberta (comentário da verificadora); 40 CEVs: 0 achados",
+      "severidade": "ERRO",
+      "comentario": "Linha da {tabela} encoberta por outro elemento (\"{trecho}\") — o texto fica ilegível; afastar as tabelas.",
+      "fonte": "CEV2 6110-0005: 'tabelas desalinhadas, não dá para ler o texto'",
+      "observacao": "Linha de tabela cortada por um preenchimento que começa ou termina no meio dela (ex.: cabeçalho da tabela seguinte sobre a última linha). Um fundo de célula cobre a linha inteira e não conta. (A leitura pela ordem de desenho foi descartada: get_texttrace derruba o processo em alguns PDFs.)",
+      "fracao_coberta": [
+        0.25,
+        0.95
+      ]
+    },
+    "CAR-14": {
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "30/10/2026: 6110-0005 B acerta 'PB' (comentário da verificadora); 40 CEVs: 0 achados",
+      "severidade": "ERRO",
+      "codigos_emissao": [
+        "EP",
+        "IN",
+        "CO",
+        "AP",
+        "OR",
+        "PD",
+        "RG",
+        "PC",
+        "FA",
+        "LC",
+        "CP",
+        "CF",
+        "CC",
+        "CD",
+        "CT"
+      ],
+      "comentario": "Código de emissão \"{codigo}\" (rev. {rev}) não existe na tabela de Códigos de Emissão ({validos}).",
+      "fonte": "CEV2 6110-0005: 'porque PB? de onde veio essa informação? favor ajustar para IN'; tabela 'Código de Emissão / Issuance Symbols' do carimbo 6110"
+    },
+    "CON-05": {
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "30/10/2026: 6110-0005 B acerta cobertura e 2 cortes (4 comentários da verificadora); 40 CEVs: 11 em 8 docs, só coberturas de telha",
+      "severidade": "ATENCAO",
+      "tipos_vista": [
+        "COBERTURA",
+        "CORTE"
+      ],
+      "regex_presenca": [
+        "(LARGURA|COMPRIMENTO).*TELHA"
+      ],
+      "comentario": "Indicar largura e comprimento total das telhas ({vista}) — item obrigatório do CheckList.",
+      "fonte": "CEV2 6110-0005: 'comprimento telhas?? item obrigatório no check-list' (4×); modelo 5420 traz '(LARGURA TOTAL TELHAS)' e 'COMPRIMENTO TELHAS'",
+      "exigir_se_tabela_regex": "TELHA",
+      "observacao": "Só em documento cuja tabela menciona TELHA (cobertura de telha; laje não conta)."
+    }
+  },
+  "blocos": {
+    "tamanho_min_titulo_pt": 7.5,
+    "max_palavras_titulo": 7,
+    "janela_primeiro_item_pt": 35,
+    "largura_max_pt": 400,
+    "margem_direita_pt": 80,
+    "meia_largura_padrao_pt": 230,
+    "gap_fim_pt": 22
+  },
+  "vistas_recorte": {
+    "tipos": [
+      [
+        "COBERTURA",
+        "^(PLANTA (DE )?)?COBERTURA"
+      ],
+      [
+        "PLANTA_BAIXA",
+        "^(TÉRREO|MEZANINO|SUBSOLO|(\\d+º?|PRIMEIRO|SEGUNDO|TERCEIRO) PAVIMENTO|PAVIMENTO\b)"
+      ],
+      [
+        "PLANTA_BAIXA",
+        "^PLANTA BAIXA"
+      ],
+      [
+        "PLANTA",
+        "^PLANTA"
+      ],
+      [
+        "CORTE",
+        "^CORTE"
+      ],
+      [
+        "ELEVACAO",
+        "^(ELEVAÇÃO|FACHADA)"
+      ],
+      [
+        "PERSPECTIVA",
+        "^(PERSPECTIVA|VISTA 3D)"
+      ],
+      [
+        "DETALHE",
+        "^(DETALHE|AMPLIAÇÃO)"
+      ]
+    ],
+    "distancia_mesma_faixa_pt": 400,
+    "margem_esquerda_pt": 60,
+    "alcance_esquerda_titulo_acima_pt": 300,
+    "min_linhas_para_julgar": 10
+  },
+  "ld": {
+    "padroes_nome": [
+      "*-PL2-*.xlsx",
+      "*Lista de Documentos*.xlsx",
+      "*LD*.xlsx"
+    ],
+    "niveis_acima_na_busca": 4,
+    "abas_preferidas": [
+      "LD - Promon",
+      "LD - Cliente"
+    ],
+    "linhas_max_ate_cabecalho": 15,
+    "cabecalho": {
+      "promon": [
+        "NO PROMON",
+        "NºPROMON",
+        "N° PROMON",
+        "NUMERO PROMON"
+      ],
+      "cliente": [
+        "NO CLIENTE",
+        "NºCLIENTE",
+        "N° CLIENTE",
+        "NUMERO CLIENTE"
+      ],
+      "titulo": [
+        "TITULO"
+      ],
+      "acao": [
+        "ATIVIDADE (A)"
+      ]
+    }
+  },
+  "saidas": {
+    "csv": false,
+    "html": true,
+    "observacao": "O _CEV.pdf é sempre gravado. CSV e relatório HTML são opcionais; na janela, a escolha do operador fica lembrada."
+  },
+  "revisao_assistida": {
+    "observacao": "Versão Claude. Usada só pela skill revisao-assistida-arquitetura; a versão offline ignora esta seção. A versão Claude SEMPRE roda antes todas as regras offline ativas (mesmo regras.json), e os achados dela entram no mesmo _CEV.pdf, CSV e relatório.",
+    "severidades": {
+      "ERRO": "Corrigir",
+      "ATENCAO": "Atenção",
+      "CORRETO": "Correto"
+    },
+    "correto_anota_pdf": false,
+    "origem_rotulo": {
+      "offline": "Verificador",
+      "claude": "Revisão assistida"
+    },
+    "formato_comentario": "{comentario}{acao}{base}",
+    "prefixo_acao": " → ",
+    "formato_base": " (Base: {base})",
+    "criterio_projeto": {
+      "classes_ld": [
+        "CTP",
+        "CP",
+        "MC"
+      ],
+      "padroes_nome": [
+        "*-AQ1-*",
+        "*CTP*",
+        "*Crit*rio*",
+        "*Criterio*",
+        "*Memorial*Conceitual*"
+      ],
+      "extensoes": [
+        ".pdf",
+        ".docx"
+      ],
+      "assuntos_ld": [
+        "AQ1"
+      ]
+    },
+    "renderizacao": {
+      "dpi_folha": 60,
+      "dpi_recorte": 160,
+      "recortes": [
+        3,
+        2
+      ],
+      "sobreposicao_rel": 0.08
+    },
+    "criterios": {
+      "RA-01": {
+        "nome": "TAG ou identificação faltando em elemento",
+        "cobre": "Falta TAG aqui (janela, porta, calha, revestimento)",
+        "tecnico": false
+      },
+      "RA-02": {
+        "nome": "Cota ou nível faltando",
+        "cobre": "Cotas faltando (PD, peitoril, calçada, eixos, amarração)",
+        "tecnico": false
+      },
+      "RA-03": {
+        "nome": "Conflito gráfico",
+        "cobre": "Texto × traço, cota sobre parede, sobreposição",
+        "tecnico": false
+      },
+      "RA-04": {
+        "nome": "Organização da folha",
+        "cobre": "Título afastado ou desalinhado da vista, vistas mal distribuídas",
+        "tecnico": false
+      },
+      "RA-05": {
+        "nome": "Representação gráfica",
+        "cobre": "Hatch, halftone, profundidade de vista, legenda que não corresponde ao desenho",
+        "tecnico": false
+      },
+      "RA-06": {
+        "nome": "Coerência entre vistas",
+        "cobre": "Planta × corte × elevação: níveis, PD, aberturas, eixos, cobertura",
+        "tecnico": true
+      },
+      "RA-07": {
+        "nome": "Notas × desenho",
+        "cobre": "Nota da folha contradiz ou não se aplica ao desenho",
+        "tecnico": true
+      },
+      "RA-08": {
+        "nome": "Critério de projeto",
+        "cobre": "Metodologia construtiva e parâmetros do critério de projeto da operação (sistema estrutural, vedação, cobertura, PD mínimo, materiais, acabamentos, módulos)",
+        "tecnico": true
+      },
+      "RA-09": {
+        "nome": "Normas e requisitos legais",
+        "cobre": "Acessibilidade (NBR 9050), saídas de emergência e segurança contra incêndio, ventilação e iluminação, NR aplicáveis",
+        "tecnico": true
+      },
+      "RA-10": {
+        "nome": "Solução de projeto",
+        "cobre": "Decisões de projeto questionáveis (drenagem, impermeabilização, corta-fogo, materiais, compatibilização)",
+        "tecnico": true
+      },
+      "RA-11": {
+        "nome": "Escala adequada",
+        "cobre": "Escala inadequada à leitura da vista",
+        "tecnico": false
+      },
+      "RA-12": {
+        "nome": "CheckList de Arquitetura",
+        "cobre": "Itens do CheckList AQ verificáveis na folha que não têm regra offline",
+        "tecnico": false
+      },
+      "RA-13": {
+        "nome": "Planta-chave de setorização",
+        "cobre": "Presença da planta-chave de layout/departamentos nas plantas gerais; legenda × cores da planta; aderência ao padrão de setorização (cores, nomes, ordem, tamanho)",
+        "tecnico": false
+      }
+    }
+  },
+  "setorizacao": {
+    "observacao": "PROPOSTA (28/10/2026) — padrão de planta-chave de setorização e legenda. Fonte única para as duas versões. Cores em tons claros calculados em LCh a partir das cores Promon: menor diferença entre setores ΔE 11,9; contraste do texto #333F48 >= 6:1. Nenhuma cor saturada (vermelho, amarelo, azul, verde do PEG0005 ficam para as marcas de verificação).",
+    "titulo_bloco": [
+      "SETORIZAÇÃO",
+      "PLANTA-CHAVE DE SETORIZAÇÃO",
+      "PLANTA-CHAVE DE LAYOUT"
+    ],
+    "setores": [
+      {
+        "nome": "ADMINISTRATIVO",
+        "hex": "#FFD7E3",
+        "rgb": [
+          255,
+          215,
+          227
+        ],
+        "inclui": [
+          "ESCRITÓRIO",
+          "SALA ADMINISTRATIVA",
+          "ENGENHARIA (se não houver setor próprio)"
+        ]
+      },
+      {
+        "nome": "CONTROLE DE ACESSO",
+        "hex": "#FABDB6",
+        "rgb": [
+          250,
+          189,
+          182
+        ],
+        "inclui": [
+          "PORTARIA",
+          "GUARITA",
+          "SEGURANÇA"
+        ]
+      },
+      {
+        "nome": "ATENDIMENTO E RECEPÇÃO",
+        "hex": "#FFD6B5",
+        "rgb": [
+          255,
+          214,
+          181
+        ],
+        "inclui": [
+          "RECEPÇÃO",
+          "ESPERA",
+          "ATENDIMENTO"
+        ]
+      },
+      {
+        "nome": "PÚBLICO E CONVIVÊNCIA",
+        "hex": "#FEF3D9",
+        "rgb": [
+          254,
+          243,
+          217
+        ],
+        "inclui": [
+          "REFEITÓRIO",
+          "ÁREA PÚBLICA",
+          "CONVIVÊNCIA",
+          "BIBLIOTECA",
+          "EXPOSIÇÕES"
+        ]
+      },
+      {
+        "nome": "OPERAÇÃO",
+        "hex": "#D1D9AB",
+        "rgb": [
+          209,
+          217,
+          171
+        ],
+        "inclui": [
+          "COZINHA",
+          "LABORATÓRIO",
+          "OFICINA",
+          "PRODUÇÃO"
+        ]
+      },
+      {
+        "nome": "REUNIÕES E TREINAMENTO",
+        "hex": "#CEF1D3",
+        "rgb": [
+          206,
+          241,
+          211
+        ],
+        "inclui": [
+          "REUNIÕES",
+          "SALA DE AULA",
+          "TREINAMENTO",
+          "INTEGRAÇÃO",
+          "AUDITÓRIO"
+        ]
+      },
+      {
+        "nome": "ESTOCAGEM",
+        "hex": "#A8D6C7",
+        "rgb": [
+          168,
+          214,
+          199
+        ],
+        "inclui": [
+          "ALMOXARIFADO",
+          "DEPÓSITO",
+          "ARMAZENAGEM",
+          "ARMAZENAGEM ALIMENTOS"
+        ]
+      },
+      {
+        "nome": "APOIO",
+        "hex": "#D1F4F7",
+        "rgb": [
+          209,
+          244,
+          247
+        ],
+        "inclui": [
+          "COPA",
+          "DESCANSO",
+          "AMBULATÓRIO"
+        ]
+      },
+      {
+        "nome": "SANITÁRIOS E VESTIÁRIOS",
+        "hex": "#B5E0FC",
+        "rgb": [
+          181,
+          224,
+          252
+        ],
+        "inclui": [
+          "S. FEM.",
+          "S. MASC.",
+          "SANIT. PCD",
+          "VESTIÁRIO"
+        ]
+      },
+      {
+        "nome": "UTILIDADES",
+        "hex": "#D7D3F9",
+        "rgb": [
+          215,
+          211,
+          249
+        ],
+        "inclui": [
+          "SALA ELÉTRICA",
+          "SALA DE TI",
+          "CASA DE MÁQUINAS",
+          "SHAFT"
+        ]
+      },
+      {
+        "nome": "LIMPEZA E RESÍDUOS",
+        "hex": "#D2BACE",
+        "rgb": [
+          210,
+          186,
+          206
+        ],
+        "inclui": [
+          "DML",
+          "LIMPEZA",
+          "RESÍDUOS",
+          "LIXO"
+        ]
+      },
+      {
+        "nome": "CIRCULAÇÃO",
+        "hex": "#EBEBEB",
+        "rgb": [
+          235,
+          235,
+          235
+        ],
+        "inclui": [
+          "CORREDOR",
+          "HALL",
+          "ESCADA"
+        ]
+      },
+      {
+        "nome": "CIRCULAÇÃO EXTERNA",
+        "hex": "#C3C7CA",
+        "rgb": [
+          195,
+          199,
+          202
+        ],
+        "inclui": [
+          "PÁTIO",
+          "CALÇADA",
+          "CIRCULAÇÃO / PÁTIO"
+        ]
+      }
+    ],
+    "complementares": [
+      {
+        "nome": "COMPLEMENTAR 1",
+        "hex": "#9CBEEB",
+        "rgb": [
+          156,
+          190,
+          235
+        ]
+      },
+      {
+        "nome": "COMPLEMENTAR 2",
+        "hex": "#A9CA9B",
+        "rgb": [
+          169,
+          202,
+          155
+        ]
+      },
+      {
+        "nome": "COMPLEMENTAR 3",
+        "hex": "#8ED2D7",
+        "rgb": [
+          142,
+          210,
+          215
+        ]
+      },
+      {
+        "nome": "COMPLEMENTAR 4",
+        "hex": "#F5B4D0",
+        "rgb": [
+          245,
+          180,
+          208
+        ]
+      }
+    ],
+    "uso_complementares": "Setor próprio do projeto que não cabe na lista (ex.: ENGENHARIA, VACINAÇÃO). Usar na ordem, com o nome do setor no lugar de COMPLEMENTAR n.",
+    "legenda": {
+      "amostra_mm": [
+        6,
+        4
+      ],
+      "contorno_mm": 0.18,
+      "texto_altura_mm": 2.0,
+      "espaco_amostra_texto_mm": 2,
+      "colunas_max": 2,
+      "colunas_max_se_mais_de_10": 3,
+      "ordem": "a ordem da lista 'setores', complementares por último",
+      "nomes": "completos, em maiúsculas, sem abreviação; setor, não nome de ambiente",
+      "area_m2": "opcional: área do setor após o nome (ex.: ADMINISTRATIVO — 245,30 m²), coerente com o Quadro de Áreas",
+      "preenchimento": "sólido, sem textura; a malha de piso pode aparecer por cima em meio-tom"
+    },
+    "tolerancia_cor_delta_e": 3,
+    "revit": "Esquema de cores 'PRM-SETORIZACAO' no template, pelo parâmetro compartilhado de ambiente 'PRM_Setor' com a lista fechada acima.",
+    "deteccao": {
+      "amostra_lado_mm": [
+        3,
+        12
+      ],
+      "amostra_proporcao_max": 2.5,
+      "amostra_tolerancia_tamanho_mm": 0.4,
+      "amostra_canal_min": 176,
+      "amostras_minimas": 3,
+      "texto_distancia_max_mm": 8,
+      "texto_largura_max_mm": 90,
+      "fracao_nomes_setor": 0.5,
+      "nomes_extras": [
+        "ENGENHARIA",
+        "RECEPÇÃO",
+        "INTEGRAÇÃO",
+        "VACINAÇÃO",
+        "ATENDIMENTO",
+        "BIBLIOTECA",
+        "EXPOSIÇÕES",
+        "COZINHA",
+        "LABORATÓRIO",
+        "PÚBLICO",
+        "REUNIÕES",
+        "LIMPEZA",
+        "RESÍDUOS",
+        "ESTOCAGEM",
+        "ARMAZENAGEM",
+        "SANIT",
+        "S. FEM",
+        "S. MASC",
+        "COPA",
+        "ESPERA",
+        "SALAS DE AULA",
+        "TREINAMENTO",
+        "CIRCULAÇÃO",
+        "PÁTIO"
+      ],
+      "observacao": "Legenda = 3 ou mais amostras preenchidas do mesmo tamanho, cada uma com texto à direita. É de setorização quando metade ou mais dos nomes são setores (lista 'setores', 'inclui' e 'nomes_extras'); assim a legenda de blocos (BLOCO A/B/C) fica de fora."
+    }
+  }
+}

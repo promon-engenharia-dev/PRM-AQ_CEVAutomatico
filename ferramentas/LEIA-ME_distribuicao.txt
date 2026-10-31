@@ -1,0 +1,31 @@
+Verificador de Projetos - Arquitetura (CEV automatica)
+=======================================================
+
+Como usar
+---------
+- De dois cliques em Verificador.bat (ou em verificador.exe) para abrir a janela.
+- Ou arraste um ou mais PDFs sobre Verificador.bat: eles ja entram na lista.
+- O resultado e gravado ao lado de cada PDF: <arquivo>_CEV.pdf (sempre) e,
+  se marcado na janela, o relatorio <arquivo>_CEV.html e a lista em CSV.
+  O PDF original nao e alterado.
+
+Nao precisa instalar nada
+-------------------------
+- O verificador.exe ja traz tudo dentro. Funciona no Windows 10/11.
+- A janela usa o WebView2 (motor do Edge, ja presente no Windows 11).
+- Na primeira abertura leva alguns segundos para iniciar.
+
+Confidencialidade
+-----------------
+- Processamento 100% local: nao usa IA, nao acessa a internet e nenhum
+  arquivo sai deste computador.
+
+Arquivos desta pasta
+--------------------
+- verificador.exe   programa
+- Verificador.bat   atalho (abrir / arrastar PDFs)
+- regras.json       parametros e textos dos comentarios (pode ser editado;
+                    se apagado, o exe usa a copia interna)
+- LEIA-ME.txt       este arquivo
+
+Mantenha os arquivos juntos na mesma pasta.
