@@ -102,14 +102,18 @@ def _tags_ambiente(ctx, pag, excl):
     for a in pag.linhas:
         if not rx_a.match(a.texto) or any(dentro(a, x) for x in excl):
             continue
-        r = fitz.Rect(a.bbox.x0 - jan["lateral"], a.bbox.y0 - jan["acima"], a.bbox.x1 + jan["lateral"], a.bbox.y1 + jan["abaixo"])
+        k = max(1.0, a.tamanho / t["janela_tamanho_ref_pt"])      # TAG em escala maior: janela maior
+        lat, aci, aba = jan["lateral"] * k, jan["acima"] * k, jan["abaixo"] * k
+        if not a.horizontal:                                       # TAG girada: o "acima" vira lateral
+            lat, aci, aba = max(aci, aba), lat, lat
+        r = fitz.Rect(a.bbox.x0 - lat, a.bbox.y0 - aci, a.bbox.x1 + lat, a.bbox.y1 + aba)
         viz = [l for l in pag.linhas if l is not a and dentro(l, r)]
         nome = next((l.texto for l in sorted(viz, key=lambda l: l.bbox.y0)
                      if l.bbox.y1 <= a.bbox.y0 + 1 and re.search(r"[A-ZÁ-Ú]{3}", l.texto)
-                     and not rx_cod.match(l.texto) and not l.texto.startswith(("EL", "("))), "?")
+                     and not rx_cod.fullmatch(l.texto) and not l.texto.startswith(("EL", "("))), "?")
         if ctx.ativa("TAG-01") and not any(rx_pd.match(l.texto) for l in viz):
             sem_pd.append((nome, a.bbox))
-        n_acab = sum(1 for l in viz if rx_cod.match(l.texto))
+        n_acab = sum(len(rx_cod.findall(l.texto)) for l in viz)
         if ctx.ativa("TAG-02") and n_acab < t["acabamentos_minimos"]:
             sem_acab.append((nome, a.bbox))
     _agrupado(ctx, "TAG-01", pag, sem_pd, item="o pé-direito (PD)")

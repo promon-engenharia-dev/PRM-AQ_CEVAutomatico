@@ -16,7 +16,7 @@ Validação de base: 40 CEVs de referência de Arquitetura, mais 3 PDFs originai
 | APR (apresentação) | APR-05, 06, 07, 08, 10, 12 | APR-05 é ATENÇÃO, com tolerância de 0,5 mm. APR-06 só nas folhas que usam "ESCALA 1 : N". APR-10 ignora nomes científicos |
 | VOC | VOC-01 | 0 achados dentro de um documento. O caso real é **entre documentos** (falta um modo multi-PDF) |
 | CON (faltantes) | CON-01, 02, 05 | CON-01/02 são redes de segurança baratas. CON-05 (telhas) só em cobertura de telha |
-| LD | LD-00 a 05 | Pegam erros reais de digitação em códigos e títulos. LD-02 é volumosa, porque a lista se repete em cada folha |
+| LD | LD-00, 01, 03, 04, 05 | Pegam erros reais de digitação nos códigos. Nos Documentos de Referência confere-se **só o número**: LD-02 (título) foi desligada em 10/11/2026, porque o projeto costuma resumir o título |
 
 Setorização (PRA-12 a 16, `regras/setorizacao.py`) e composição da folha (APR-12/13, TAB-07, CAR-14, `regras/composicao.py`): ver catálogo §19 e §20.
 
@@ -25,6 +25,7 @@ Setorização (PRA-12 a 16, `regras/setorizacao.py`) e composição da folha (AP
 | Regras | Lote | Motivo |
 |---|---|---|
 | APR-04 (texto duplicado sobreposto) | 3 | Não aparece na plotagem e ninguém comenta |
+| LD-02 (título da referência × LD) | 3 | Pedido da usuária (10/11/2026): o título é resumido no projeto; vale só o número. Era a mais volumosa (117 caixas em 11 docs) |
 | VOC-02 (com × sem acento) | 2 | 34 achados que ninguém comenta. Sem dicionário, não sabe qual forma é a correta |
 | CON-03 (descida de água pluvial) | 2 | Dispara em 23 de 30 coberturas, porque a descida costuma ser só um símbolo |
 | CON-04 (cota entre eixos) | 2 | Protótipo, amostra pequena e sem confirmação |

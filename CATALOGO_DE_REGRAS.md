@@ -339,7 +339,7 @@ Os títulos de carimbo seguem o padrão “nome do projeto + título da LD + vis
 |---|---|---|---|---|
 | LD-00 | LD carregada é de outra operação que não a do documento; a conferência com a LD não é feita (pré-condição da família) | ATENÇÃO | `A LD carregada é da operação {op_ld}, mas o documento é da {op_doc} — conferência com a LD não realizada.` | L1 (só serve LD da mesma operação) |
 | LD-01 | Código citado nos Documentos de Referência não existe na LD (nem como Nº Promon nem como Nº Cliente). Quando há código da LD muito parecido (diferença de até 2 caracteres ou letras trocadas), ele é sugerido | ERRO | `Documento {codigo} não consta na LD.` / `Documento {codigo} não consta na LD — seria {sugestao} ("{titulo_ld}")?` | sua sugestão · CEV “a lista de documentos de referência precisa estar com a nomenclatura conforme os títulos da Lista de Documentos” (2/2), “Esses documentos estão em conformidade com a LD da Fase 2?” (2/1) |
-| LD-02 | Código existe, mas o título citado difere do título da LD. Diferenças só de espaço e pontuação são ignoradas; abreviações (INFRA., SIST., INST.) e palavras faltando ou trocadas são apontadas | ATENÇÃO | `Título difere da LD: "{titulo_ld}".` | idem · “O título deve estar igual à LD” |
+| LD-02 | Código existe, mas o título citado difere do título da LD. Diferenças só de espaço e pontuação são ignoradas; abreviações (INFRA., SIST., INST.) e palavras faltando ou trocadas são apontadas | ATENÇÃO | `Título difere da LD: "{titulo_ld}".` | idem · “O título deve estar igual à LD”  **desativada em 10/11/2026** (§21: vale só o número) |
 | LD-03 | Documento citado está marcado como Excluir (E) na LD | ERRO | `Documento {codigo} está excluído da LD.` | PEG7 9.4.8 |
 | LD-04 | Número do carimbo não existe na LD | ERRO | `Número do documento ({numero}) não consta na LD.` | PEG7 9.4.1 |
 | LD-05 | Título da LD não está contido no título do carimbo | ATENÇÃO | `Título do carimbo difere da LD: "{titulo_ld}".` | PEG7 9.4.8 · “O título deve estar igual à LD” |
@@ -716,3 +716,35 @@ Para rodar os protótipos: `python -X utf8 -m verificador --lote 2 arquivo.pdf`.
 **Já coberto antes:** datas "XX/XX/26" (CAR-02 e PRA-10), título × LD (LD-05) e descida de água pluvial. A descida é a CON-03, que fica no lote 2 com mais esta evidência (2×).
 
 **Leitura técnica:** a checagem "texto sob um preenchimento desenhado depois" pela ordem de desenho foi descartada, porque `get_texttrace` do PyMuPDF derruba o processo em alguns PDFs. A TAB-07 usa só a geometria.
+
+
+## 21. Ajustes pedidos pela usuária (10/11/2026)
+
+**Pedidos:**
+1. pegar erros de ortografia e de digitação;
+2. nos Documentos de Referência, conferir só o número, porque o título costuma ser resumido no projeto;
+3. TAGs de ambiente preenchidas recebendo comentário de "falta PD" ou "faltam acabamentos";
+4. apontar a falta de cotas: de nível, de dimensões dos ambientes e de altura do pé-direito (a lista veio incompleta);
+5. conferir se existe a planta de setorização e se as cores estão corretas.
+
+**Feito agora:**
+- **LD-02 desativada (pedido 2).** Nos Documentos de Referência continuam o LD-01 (código não consta na LD, com sugestão do código parecido) e o LD-03 (documento excluído). O LD-05 (título do **carimbo** × LD) continua ativo, porque é o título do próprio documento.
+- **Leitura das TAGs de ambiente (pedido 3).** Causa encontrada nos CEVs: acabamento de parede escrito como **"RE10/30"** ou **"RE30/34"** (dois revestimentos no mesmo campo). A regra exigia o código sozinho na linha, contava só 2 acabamentos e acusava a TAG completa. Mudanças em `tag_ambiente`:
+  - os códigos de acabamento são contados **dentro** de cada linha (`RE10/30`, `PI-10`, `PI10A`, `PI10 TE30`);
+  - a janela de busca cresce com o corpo do texto `A=` (TAG em escala maior) e gira com a TAG vertical;
+  - o PD aceita também `PÉ-DIREITO` e `P.D.:`.
+
+**Resultado nos 40 CEVs (lote 1):** 374 → 253 achados.
+
+| Regra | Antes | Depois | Leitura |
+|---|---|---|---|
+| LD-02 | 117 | 0 | desativada |
+| TAG-02 | 11 em 9 docs | 7 em 6 docs | os 4 que saíram eram falsos ("RE10/30") em 1310-0002, 1311-0001, 6110-0010 e 7610-0003 |
+| TAG-01 | 7 em 7 docs | 7 em 7 docs | todos conferidos no desenho: as TAGs não têm PD |
+| demais | — | iguais | — |
+
+**Pendente, com perguntas à usuária:**
+- **Ortografia (pedido 1):** proposta de regra nova com dicionário local (sem rede) e glossário técnico, só para palavras com correção próxima. Ver REL-01/VOC-02.
+- **Cotas (pedido 4):** hoje só existe a CON-01 (vista sem nenhuma cota de nível). Faltam a lista completa e o critério de cada cota.
+- **Setorização (pedido 5):** a PRA-12 (falta a planta-chave) está ativa e dispara corretamente nos 40 CEVs. A PRA-13 (cor fora do padrão) existe, mas está desligada até a aprovação do padrão, e só reconhece o setor pelo nome exato da lista. Nas legendas atuais, quase nenhum nome bate (REUNIÕES, COZINHA, BIBLIOTECA…).
+

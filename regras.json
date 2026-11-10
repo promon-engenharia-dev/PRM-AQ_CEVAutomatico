@@ -1141,7 +1141,7 @@
     "TAG-comum": {
       "tag_ambiente": {
         "regex_area": "^A\\s*=\\s*(?P<valor>\\d+(?:[.,]\\d+)?)\\s*m[²2]$",
-        "regex_pd": "^P\\.?\\s*D\\.?\\s*=?\\s*\\S",
+        "regex_pd": "^(P\\.?\\s*D\\.?|P[ÉE][\\s\\-]*DIREITO)\\s*[=:]?\\s*\\S",
         "raio_agrupamento_mm": 15,
         "acabamentos_minimos": 3,
         "normalizacao_nome": {
@@ -1150,12 +1150,14 @@
           "colapsar_espacos": true
         },
         "tolerancia_area_m2": 0.01,
-        "regex_acabamento": "^[A-Z]{2,3}\\d{2,3}$",
+        "regex_acabamento": "\\b[A-Z]{2,3}[\\s\\-]?\\d{2,3}[A-Z]?\\b",
         "janela_pt": {
           "lateral": 45,
           "acima": 55,
           "abaixo": 22
-        }
+        },
+        "janela_tamanho_ref_pt": 8,
+        "observacao": "10/11/2026 (falsos 'falta PD/acabamento' em TAGs preenchidas): a janela cresce com o corpo do texto 'A=' (janela_pt vale para 8 pt) e gira com a TAG vertical; PD aceita 'PÉ-DIREITO'; os códigos de acabamento são contados dentro de cada linha (PI-10, PI10/TE30, PI10A)."
       }
     },
     "TAG-01": {
@@ -1592,10 +1594,11 @@
       "comentario_sugestao": "Documento {codigo} não consta na LD — seria {sugestao} (\"{titulo_ld}\")?"
     },
     "LD-02": {
-      "ativa": true,
-      "lote": 1,
+      "ativa": false,
+      "lote": 3,
       "severidade": "ATENCAO",
-      "comentario": "Título de {codigo} difere da LD ({diferenca}). Na LD: \"{titulo_ld}\"."
+      "comentario": "Título de {codigo} difere da LD ({diferenca}). Na LD: \"{titulo_ld}\".",
+      "status_teste": "10/11/2026: desativada a pedido da usuária — nos Documentos de Referência confere-se só o número (LD-01/LD-03), porque o título costuma ser resumido no projeto. Era a regra mais volumosa (117 caixas em 11 dos 40 CEVs)."
     },
     "LD-03": {
       "ativa": true,
