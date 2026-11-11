@@ -8,14 +8,14 @@ Validação de base: 40 CEVs de referência de Arquitetura, mais 3 PDFs originai
 
 | Família | Regras | Observação |
 |---|---|---|
-| PRA (prancha) | PRA-01, 05, 06, 07, 08, 09, 10, 12, 14, 16 | PRA-01 só em documento de edificação, isto é, com TAG `A= … m²`. PRA-05 depende da ficha. PRA-08 confere `/n/` contra a lista de referências da **mesma folha** e ignora "VER NOTA /n/" |
+| PRA (prancha) | PRA-01, 05, 06, 07, 08, 09, 10, 12, 13, 14, 16 | PRA-01 só em documento de edificação, isto é, com TAG `A= … m²`. PRA-05 depende da ficha. PRA-08 confere `/n/` contra a lista de referências da **mesma folha** e ignora "VER NOTA /n/" |
 | CAR (carimbo) | CAR-00 a 07, 09, 10, 14 | Só rodam com o modelo de carimbo reconhecido. CAR-03 compara a revisão **e** o número com o nome do arquivo. CAR-02 depende da ficha |
 | TAB (tabelas) | TAB-01 a 04, 07 | TAB-01 exige uma tabela só quando o desenho usa o prefixo correspondente |
 | KEY (keynotes) | KEY-00, 01, 04 | O vocabulário vem da coluna TAG das tabelas do próprio documento. Exclusões de normas, modelos de equipamento e prefixos de mobiliário ou louças. FL = Folha, não é keynote |
 | TAG (ambiente) | TAG-01, 02, 05 | Batem com os comentários "PD?" e "acabamentos?" dos verificadores. TAG-01/02 saem **agrupadas por folha** (um comentário listando os ambientes, com marca em cada TAG) |
 | APR (apresentação) | APR-05, 06, 07, 08, 10, 12 | APR-05 é ATENÇÃO, com tolerância de 0,5 mm. APR-06 só nas folhas que usam "ESCALA 1 : N". APR-10 ignora nomes científicos |
-| VOC | VOC-01 | 0 achados dentro de um documento. O caso real é **entre documentos** (falta um modo multi-PDF) |
-| CON (faltantes) | CON-01, 02, 05 | CON-01/02 são redes de segurança baratas. CON-05 (telhas) só em cobertura de telha |
+| VOC | VOC-01, 04 | VOC-01: 0 achados dentro de um documento; o caso real é **entre documentos** (falta um modo multi-PDF). VOC-04 (ortografia, 11/11/2026): dicionário local + glossário técnico (`verificador/dic/glossario_tecnico.txt`) + glossário local de nomes (fora do Git) + títulos da LD; ignora acento omitido e o carimbo |
+| CON (faltantes) | CON-01, 02, 05, 08 | CON-01/02 são redes de segurança baratas. CON-05 (telhas) só em cobertura de telha. CON-08: corte sem cota vertical nem PD |
 | LD | LD-00, 01, 03, 04, 05 | Pegam erros reais de digitação nos códigos. Nos Documentos de Referência confere-se **só o número**: LD-02 (título) foi desligada em 10/11/2026, porque o projeto costuma resumir o título |
 
 Setorização (PRA-12 a 16, `regras/setorizacao.py`) e composição da folha (APR-12/13, TAB-07, CAR-14, `regras/composicao.py`): ver catálogo §19 e §20.
@@ -28,9 +28,9 @@ Setorização (PRA-12 a 16, `regras/setorizacao.py`) e composição da folha (AP
 | LD-02 (título da referência × LD) | 3 | Pedido da usuária (10/11/2026): o título é resumido no projeto; vale só o número. Era a mais volumosa (117 caixas em 11 docs) |
 | VOC-02 (com × sem acento) | 2 | 34 achados que ninguém comenta. Sem dicionário, não sabe qual forma é a correta |
 | CON-03 (descida de água pluvial) | 2 | Dispara em 23 de 30 coberturas, porque a descida costuma ser só um símbolo |
-| CON-04 (cota entre eixos) | 2 | Protótipo, amostra pequena e sem confirmação |
+| CON-04 (cota entre eixos), CON-06 (dimensões do ambiente), CON-07 (nível do ambiente) | 2 | Aprovadas pela usuária em 11/11/2026, mas ruidosas nos 40 CEVs: a TAG de ambiente costuma ficar fora do ambiente, presa por linha de chamada, e CON-04 acusou eixos já cotados. Cobertas pela versão Claude (RA-02). Próximo passo: seguir a linha de chamada da TAG |
 | APR-01, 02, 03 (altura de texto, sobreposição) | 2 | Exigem classificar o texto por classe do template (ver decisão Q2-b) |
-| PRA-13 e PRA-15 (aguardam aprovação do padrão de setorização), APR-13 (vistas desalinhadas, sem evidência fora do 6110-0005) | 2 | Ver catálogo §19 e §20 |
+| PRA-15 (nome fora da lista: o padrão aceita setores próprios nas cores complementares), APR-13 (vistas desalinhadas, sem evidência fora do 6110-0005) | 2 | Ver catálogo §19 e §20 |
 | PRA-02, 03, 04, 11; CAR-08, 11, 12, 13; KEY-02, 03; TAG-03, 04, 07; VOC-03 | 2 | Heurística de layout ainda não calibrada |
 | TAB-05, TAG-06, APR-09 | 3 | Evidência fraca ou contraditória (APR-09: a escala aceitável é juízo do verificador) |
 | TAB-06 (célula vazia) | 3 | Exige ler a grade das tabelas pelos vetores de borda |

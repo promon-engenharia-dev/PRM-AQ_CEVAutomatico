@@ -38,5 +38,8 @@ Arquivos desta pasta
 - regras.json       parametros e textos dos comentarios (pode ser editado;
                     se apagado, o exe usa a copia interna)
 - LEIA-ME.txt       este arquivo
+- glossario_local.txt  (opcional, voce cria) palavras que a verificacao de
+                    grafia nao deve apontar: nomes de pessoas, marcas,
+                    termos da equipe. Uma palavra por linha.
 
 Mantenha os arquivos juntos na mesma pasta.

@@ -146,6 +146,9 @@ def verificar(ctx):
             ctx.add("PRA-12", 0, fitz.Rect(alvo.x0, alvo.y0, alvo.x1, alvo.y0 + 20))
 
     padrao = {normalizar(s["nome"]): s for s in cfg["setorizacao"]["setores"]}
+    # nome da legenda que não é o do setor, mas um ambiente que ele inclui (COZINHA → OPERAÇÃO)
+    # ("ENGENHARIA (se não houver setor próprio)" fica de fora: na legenda, ela é o setor próprio)
+    por_ambiente = {normalizar(i): s for s in cfg["setorizacao"]["setores"] for i in s["inclui"] if "(" not in i}
     tol = cfg["setorizacao"]["tolerancia_cor_delta_e"]
     for leg in legendas:
         if ctx.ativa("PRA-14"):
@@ -168,9 +171,19 @@ def verificar(ctx):
                 if len(perto) > 4:
                     texto += f" e mais {len(perto) - 4} pares"
                 ctx.add("PRA-16", leg.pagina, leg.area, regiao=True, pares=texto)
+        fora = []
         for i in leg.itens:
             s = padrao.get(normalizar(i.nome))
             if s is None and ctx.ativa("PRA-15"):
                 ctx.add("PRA-15", leg.pagina, i.amostra, nome=i.nome, sugestao="um setor da lista padrão")
-            elif s is not None and ctx.ativa("PRA-13") and delta_e(i.cor, s["rgb"]) > tol:
-                ctx.add("PRA-13", leg.pagina, i.amostra, setor=s["nome"], hex_padrao=s["hex"])
+            s = s or por_ambiente.get(normalizar(i.nome))
+            if s is not None and ctx.ativa("PRA-13") and delta_e(i.cor, s["rgb"]) > tol:
+                fora.append((i, s))
+        if len(fora) == 1:
+            i, s = fora[0]
+            ctx.add("PRA-13", leg.pagina, i.amostra, nome=i.nome, setor=s["nome"], hex_padrao=s["hex"])
+        elif fora:                          # um comentário por legenda, com marca em cada amostra
+            setores = "; ".join(f"{i.nome} → {s['hex']}" if normalizar(i.nome) == normalizar(s["nome"])
+                                else f"{i.nome} → {s['hex']} ({s['nome']})" for i, s in fora)
+            ctx.add("PRA-13", leg.pagina, fora[0][0].amostra, chave="comentario_agrupado",
+                    extras=[i.amostra for i, _ in fora[1:]], setores=setores)

@@ -1465,6 +1465,25 @@
       },
       "comentario": "Nível EL. {valor} nomeado como {nomes} em vistas diferentes."
     },
+    "VOC-04": {
+      "ativa": true,
+      "lote": 1,
+      "severidade": "ATENCAO",
+      "dicionario": "pt",
+      "glossario": "verificador/dic/glossario_tecnico.txt",
+      "glossario_local": "glossario_local.txt",
+      "regex_palavra": "[A-Za-zÀ-ÿ]{5,}",
+      "distancia_max": 2,
+      "ignorar_so_acento": true,
+      "usar_titulos_da_ld": true,
+      "max_palavras_listadas": 8,
+      "max_sugestoes": 2,
+      "distancia_glossario": 1,
+      "comentario": "Verificar grafia: \"{palavra}\" — seria \"{sugestao}\"?",
+      "comentario_agrupado": "Verificar grafia: {palavras}.",
+      "fonte": "Pedido da usuária (10/11/2026): erros de ortografia e de digitação. CEVs: 'Ajustar ortografia - EMISSÃO', títulos com NFRAESTRUTURA/SUBETRRÂNEOS/SISTT (antes pegos pela LD-02)",
+      "observacao": "Dicionário de português local (pyspellchecker, sem rede) + glossário técnico versionado + glossário local de nomes (fora do Git) + palavras dos títulos da LD. Só aponta palavra desconhecida que tem correção próxima no dicionário; diferença só de acento (NIVEL × NÍVEL) é ignorada. O carimbo fica de fora. Um comentário por folha, com marca em cada ocorrência."
+    },
     "REL-01": {
       "ativa": false,
       "lote": 3,
@@ -1561,6 +1580,7 @@
     "CON-04": {
       "ativa": false,
       "lote": 2,
+      "status_teste": "11/11/2026: aprovada pela usuária, mas validada nos 40 CEVs: 14 achados em 5 docs, só 3 perto de marca e nenhuma sobre cota de eixo; no 1310-0002 acusou 6–7 com a cota 600 desenhada. Fica no lote 2; a versão Claude cobre (RA-02).",
       "severidade": "ATENCAO",
       "tipos_vista": [
         "PLANTA_BAIXA",
@@ -1628,11 +1648,12 @@
       "observacao": "Documento de edificação com planta geral (vista PLANTA BAIXA/PLANTA) e nenhuma legenda de setorização em nenhuma folha."
     },
     "PRA-13": {
-      "ativa": false,
-      "lote": 2,
-      "status_teste": "30/10/2026: implementada; depende da aprovação do padrão de setorização",
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "11/11/2026: ativada — padrão de setorização aprovado pela usuária. O setor é reconhecido pelo nome ou por um ambiente que ele inclui (COZINHA → OPERAÇÃO). Setores próprios do projeto (cores complementares) não são conferidos.",
       "severidade": "ERRO",
-      "comentario": "Setor \"{setor}\": cor fora do padrão de setorização (usar {hex_padrao})."
+      "comentario": "Setor \"{nome}\": cor fora do padrão de setorização — usar {hex_padrao} ({setor}).",
+      "comentario_agrupado": "Cores fora do padrão de setorização: {setores}."
     },
     "PRA-14": {
       "ativa": true,
@@ -1743,6 +1764,48 @@
       "fonte": "CEV2 6110-0005: 'comprimento telhas?? item obrigatório no check-list' (4×); modelo 5420 traz '(LARGURA TOTAL TELHAS)' e 'COMPRIMENTO TELHAS'",
       "exigir_se_tabela_regex": "TELHA",
       "observacao": "Só em documento cuja tabela menciona TELHA (cobertura de telha; laje não conta)."
+    },
+    "CON-06": {
+      "ativa": false,
+      "lote": 2,
+      "status_teste": "11/11/2026: 25 achados em 23 dos 40 CEVs. Amostra conferida no desenho (T012-0211 PORTARIA, T015-1304 ESCRITÓRIO, T015-1310 DML, 6110-0002, 7610-0002): falsos — a TAG fica fora do ambiente, presa por linha de chamada, e as cotas estão no ambiente. Lote 2 até a regra seguir a linha de chamada; a versão Claude cobre (RA-02).",
+      "severidade": "ATENCAO",
+      "tipos_vista": ["PLANTA_BAIXA"],
+      "regex_cota": "^\\d{2,5}([,.]\\d{1,2})?$",
+      "fator_raio": 1.0,
+      "raio_min_pt": 40,
+      "fator_faixa": 0.5,
+      "escala_padrao": 100,
+      "comentario": "Cotar as dimensões do ambiente {ambiente} (largura e comprimento).",
+      "comentario_agrupado": "Ambientes sem cotas de dimensão nas duas direções: {ambientes}.",
+      "max_ambientes_listados": 6,
+      "fonte": "Pedido da usuária (10/11/2026): cotas de dimensões dos ambientes; CK (cotas internas dos ambientes)",
+      "observacao": "Para cada TAG de ambiente (A= … m²) na planta baixa: exige uma cota numérica horizontal na faixa de colunas do ambiente e uma vertical na faixa de linhas, em qualquer ponto da vista (correntes de cota da borda contam). Meia-largura da faixa = fator_faixa × fator_raio × √A, pela escala da vista (mínimo raio_min_pt × fator_faixa)."
+    },
+    "CON-07": {
+      "ativa": false,
+      "lote": 2,
+      "status_teste": "11/11/2026: 25 achados em 23 dos 40 CEVs, mesmo problema da CON-06 (TAG fora do ambiente; o EL. está dentro do ambiente). Lote 2; a versão Claude cobre (RA-02).",
+      "severidade": "ATENCAO",
+      "tipos_vista": ["PLANTA_BAIXA"],
+      "regex_nivel": "^EL\\.?\\s*[+\\-±]?\\s*(\\d|\\?)",
+      "comentario": "Indicar a cota de nível (EL.) do ambiente {ambiente}.",
+      "comentario_agrupado": "Ambientes sem cota de nível (EL.): {ambientes}.",
+      "max_ambientes_listados": 6,
+      "fonte": "Pedido da usuária (10/11/2026): cota de nível em cada ambiente; CK B30",
+      "observacao": "Procura EL. num quadrado em volta da TAG com meio-lado = fator_raio × √A da CON-06 (pela escala da vista). Complementa a CON-01, que só exige uma cota de nível por vista."
+    },
+    "CON-08": {
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "11/11/2026: 1 achado nos 40 CEVs (T015-1304-0001, CORTE C-C), junto de marca da verificadora; sem falso positivo.",
+      "severidade": "ATENCAO",
+      "tipos_vista": ["CORTE"],
+      "regex_cota": "^\\d{2,5}([,.]\\d{1,2})?$",
+      "regex_pd": "^(P\\.?\\s*D\\.?|P[ÉE][\\s\\-]*DIREITO)\\b",
+      "comentario": "Cotar a altura do pé-direito no corte ({vista}).",
+      "fonte": "Pedido da usuária (10/11/2026): cotas de altura dos pés-direitos; CEV 'PD?' (12×), 'Faltou cotar o PD e o entreforro'",
+      "observacao": "Corte sem nenhuma cota vertical (número escrito na vertical) e sem texto de PD."
     }
   },
   "blocos": {
@@ -1942,11 +2005,16 @@
         "nome": "Planta-chave de setorização",
         "cobre": "Presença da planta-chave de layout/departamentos nas plantas gerais; legenda × cores da planta; aderência ao padrão de setorização (cores, nomes, ordem, tamanho)",
         "tecnico": false
+ },
+      "RA-14": {
+        "nome": "Ortografia e digitação",
+        "cobre": "Erros de grafia e de digitação em todo o texto da folha (notas, tabelas, títulos, TAGs, referências), inclusive os que o dicionário da versão offline não pega: palavra existente usada no lugar errado (SESSÃO × SEÇÃO), concordância, termo técnico mal escrito, acentuação incorreta e abreviação fora do padrão. Começa pelos achados VOC-04 da versão offline",
+        "tecnico": false
       }
     }
   },
   "setorizacao": {
-    "observacao": "PROPOSTA (28/10/2026) — padrão de planta-chave de setorização e legenda. Fonte única para as duas versões. Cores em tons claros calculados em LCh a partir das cores Promon: menor diferença entre setores ΔE 11,9; contraste do texto #333F48 >= 6:1. Nenhuma cor saturada (vermelho, amarelo, azul, verde do PEG0005 ficam para as marcas de verificação).",
+    "observacao": "APROVADO pela usuária em 11/11/2026 (proposto em 28/10/2026) — padrão de planta-chave de setorização e legenda. Fonte única para as duas versões. Cores em tons claros calculados em LCh a partir das cores Promon: menor diferença entre setores ΔE 11,9; contraste do texto #333F48 >= 6:1. Nenhuma cor saturada (vermelho, amarelo, azul, verde do PEG0005 ficam para as marcas de verificação).",
     "titulo_bloco": [
       "SETORIZAÇÃO",
       "PLANTA-CHAVE DE SETORIZAÇÃO",

@@ -679,7 +679,7 @@ Para rodar os protótipos: `python -X utf8 -m verificador --lote 2 arquivo.pdf`.
 | Código | Regra | Sev. | Resultado | Estado |
 |---|---|---|---|---|
 | PRA-12 | Planta geral de edificação sem legenda de setorização em nenhuma folha | ATENÇÃO | Acerta o 5420 (sem setorização). Nos 40 CEVs dispara em 26 documentos, 21 deles de projetos antigos (T015/T012) | **ativa** em todos os projetos (decisão da usuária em 30/10/2026) |
-| PRA-13 | Cor do setor fora da paleta padrão | ERRO | Implementada | lote 2, aguarda aprovação do padrão |
+| PRA-13 | Cor do setor fora da paleta padrão | ERRO | Implementada | **ativa** desde 11/11/2026 (padrão aprovado, §22) |
 | PRA-14 | Item da legenda sem uso na planta, ou mesma cor em dois itens | ERRO | 0 achados (todas as legendas coerentes) | **ativa** |
 | PRA-15 | Nome fora da lista padrão de setores | ATENÇÃO | Implementada | lote 2, aguarda aprovação do padrão |
 | PRA-16 | Cores muito parecidas na legenda (ΔE < 10) | ATENÇÃO | Dispara nas 6 legendas existentes (ΔE 4 a 8). Bate com o comentário "CORES MUITO PARECIDAS" do verificador no 6110-0001 | **ativa** |
@@ -747,4 +747,36 @@ Para rodar os protótipos: `python -X utf8 -m verificador --lote 2 arquivo.pdf`.
 - **Ortografia (pedido 1):** proposta de regra nova com dicionário local (sem rede) e glossário técnico, só para palavras com correção próxima. Ver REL-01/VOC-02.
 - **Cotas (pedido 4):** hoje só existe a CON-01 (vista sem nenhuma cota de nível). Faltam a lista completa e o critério de cada cota.
 - **Setorização (pedido 5):** a PRA-12 (falta a planta-chave) está ativa e dispara corretamente nos 40 CEVs. A PRA-13 (cor fora do padrão) existe, mas está desligada até a aprovação do padrão, e só reconhece o setor pelo nome exato da lista. Nas legendas atuais, quase nenhum nome bate (REUNIÕES, COZINHA, BIBLIOTECA…).
+
+## 22. Ortografia, cotas e cores da setorização (11/11/2026)
+
+**Decisões da usuária (resposta ao §21):**
+1. Ortografia com **dicionário + glossário** na versão offline e **apoio de IA** na versão Claude.
+2. **Padrão de setorização aprovado** (`padroes/padrao-setorizacao.html`, `regras.json → setorizacao`).
+3. Cotas aprovadas: nível em cada ambiente, dimensões dos ambientes, altura do pé-direito nos cortes e cotas entre eixos.
+4. Os PDFs com os falsos comentários de TAG foram apagados; vale a correção do §21 (RE10/30).
+
+**Regras novas e alteradas:**
+
+| Código | Regra | Severidade | Resultado nos 40 CEVs | Estado |
+|---|---|---|---|---|
+| VOC-04 | Palavra desconhecida com correção próxima: "Verificar grafia: X — seria Y?". Um comentário por folha, com marca em cada ocorrência | ATENÇÃO | 64 achados em 32 docs, todos erros reais: CONUNTOS, ONUDLADA, ARUQUITETURA, SERVIÇOES, ESRTOCADOS, BERREIRA, TERRAPLEMAGEM, INSTUMENTAÇÃO, CRITÉTRIO, CORRESPONED, CARTACHO, ACABAMENTONA, BADEIRA, CONTENEDORES, PARADES, PERSPECITVA, DIIMENSÕES, NFRAESTRUTURA, EVESTIMENTO | **ativa** |
+| PRA-13 | Cor do setor fora da paleta (ΔE > 3). Reconhece o setor pelo nome ou por um ambiente que ele inclui (COZINHA → OPERAÇÃO). Um comentário por legenda | ERRO | 4 legendas (6110-0001, 0002, 0011, 7610-0002), todas anteriores ao padrão | **ativa** |
+| CON-08 | Corte sem cota vertical e sem texto de PD | ATENÇÃO | 1 (T015-1304-0001, CORTE C-C), com marca da verificadora | **ativa** |
+| CON-06 | Ambiente sem cota de dimensão nas duas direções (faixa da TAG nas correntes de cota) | ATENÇÃO | 25 em 23 docs; amostra conferida: falsos | lote 2 |
+| CON-07 | Ambiente sem cota de nível (EL.) perto da TAG | ATENÇÃO | 25 em 23 docs; amostra conferida: falsos | lote 2 |
+| CON-04 | Cota entre eixos consecutivos | ATENÇÃO | 14 em 5 docs; acusou eixos já cotados (1310-0002, 6–7 com "600") | lote 2 |
+| RA-14 | Versão Claude: ortografia e digitação, a partir dos achados VOC-04 | — | — | ativo |
+
+**Por que CON-06 e CON-07 não foram ativadas:** nos projetos 6110, 7610, T012 e T015, a TAG de ambiente pequeno costuma ficar **fora do ambiente**, presa por uma linha de chamada, enquanto as cotas e o EL. ficam dentro do ambiente. A posição da TAG não diz onde o ambiente está. Amostras conferidas no desenho: T012-0211 (PORTARIA), T015-1304-0001 (ESCRITÓRIO, RACK), T015-1310-0002 (DML), 6110-0002 (DESCARTÁVEIS) e 7610-0002 (COPA, S. PCD). **Próximo passo:** seguir a linha de chamada (vetor que sai da TAG) até o ambiente. Até lá, o tema fica com a versão Claude (RA-02).
+
+**Ortografia: como funciona a VOC-04.**
+- Dicionário de português local: `pyspellchecker`, arquivo `pt.json.gz` embutido no exe, sem rede.
+- Palavra conhecida = está no dicionário, no glossário técnico (`verificador/dic/glossario_tecnico.txt`, versionado), no glossário local (`glossario_local.txt` ao lado do `regras.json`, fora do Git, para nomes de pessoas) ou nos títulos da LD.
+- Só aponta palavra com 5 letras ou mais, com correção a até 2 letras de distância. Sugere primeiro a forma do glossário (português do Brasil e termo técnico: TERRAPLENAGEM, PERSPECTIVA), depois a do dicionário.
+- Diferença só de acento (NIVEL × NÍVEL) é ignorada, porque os verificadores não comentam. O carimbo fica de fora (nomes e texto em inglês).
+- **Limite da validação:** o glossário foi montado a partir dos mesmos 40 CEVs, separando à mão os termos técnicos dos erros. Por isso a precisão medida aqui é otimista. Em projeto novo, termos e marcas ainda não vistos vão aparecer; basta acrescentá-los ao glossário.
+- O dicionário mistura português do Brasil e de Portugal, por isso REGISTRO, CONTATO, SEÇÃO e ASPECTO estão no glossário.
+
+**Total nos 40 CEVs (lote 1):** 253 → 322 achados (+64 VOC-04, +4 PRA-13, +1 CON-08).
 

@@ -17,6 +17,7 @@ Os códigos e nomes oficiais estão em `regras.json → revisao_assistida.criter
 | RA-11 Escala | Escala inadequada à leitura (muito pequena para o detalhe) ou carimbo × vistas | Títulos de vista e carimbo |
 | RA-12 CheckList AQ | Itens do `referencias/CheckList Arquitetura.xlsx` verificáveis na folha que não têm regra offline ativa | CheckList × folha |
 | RA-13 Planta-chave de setorização | Em documento com planta geral, há planta-chave de layout/departamentos com legenda? A legenda segue o padrão: título SETORIZAÇÃO, setores da lista fechada, cor de cada setor (`regras.json → setorizacao`), ordem fixa, nomes completos, cor lisa? Legenda × planta: todo setor colorido está na legenda e vice-versa? A área por setor bate com o Quadro de Áreas? | Planta-chave × legenda × `padroes/padrao-setorizacao.html` |
+| RA-14 Ortografia e digitação | Comece pelos achados **VOC-04** da versão offline e confirme cada um. Depois leia todo o texto da folha e aponte o que o dicionário não pega: palavra que existe mas está errada no contexto (SESSÃO × SEÇÃO, CONCERTO × CONSERTO), letra trocada que forma outra palavra, concordância ("PAREDES INTERNO"), acentuação incorreta (fora das maiúsculas sem acento, que o verificador aceita), termo técnico mal escrito e abreviação fora do padrão do projeto. Cite a forma correta | Notas, tabelas, títulos, TAGs, Documentos de Referência |
 
 ## Severidade
 

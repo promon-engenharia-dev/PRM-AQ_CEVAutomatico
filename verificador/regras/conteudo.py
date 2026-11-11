@@ -41,6 +41,10 @@ def verificar(ctx):
                     ctx.add(codigo, pag.indice, v.titulo.bbox, vista=v.titulo.texto)
             if ctx.ativa("CON-04") and v.tipo in ctx.p("CON-04")["tipos_vista"]:
                 _cotas_eixos(ctx, pag, v, ls)
+            if ctx.ativa("CON-08") and v.tipo in ctx.p("CON-08")["tipos_vista"]:
+                _pe_direito_corte(ctx, pag, v, ls)
+        if ctx.ativa("CON-06") or ctx.ativa("CON-07"):
+            _cotas_ambientes(ctx, pag, excl)
         if ctx.ativa("TAG-01") or ctx.ativa("TAG-02"):
             _tags_ambiente(ctx, pag, excl)
 
@@ -88,6 +92,60 @@ def _cotas_eixos(ctx, pag, v, ls):
                 if not achou:
                     alvo = fitz.Rect(a.bbox) | b.bbox
                     ctx.add("CON-04", pag.indice, alvo, regiao=True, e1=a.texto, e2=b.texto)
+
+
+# CON-06 / CON-07 / CON-08 ----------------------------------------------------
+
+def _nome_ambiente(a, linhas) -> str:
+    """Nome escrito logo acima do 'A= … m²' (a linha em caixa alta mais próxima)."""
+    acima = [l for l in linhas if l.bbox.y1 <= a.bbox.y0 + 1 and abs(l.cx - a.cx) < 60 and a.bbox.y0 - l.bbox.y1 < 60
+             and re.search(r"[A-ZÁ-Ú]{3}", l.texto) and not l.texto.startswith(("EL", "("))
+             and not re.fullmatch(r"[A-Z]{2,3}[\s\-]?\d{2,3}[A-Z]?", l.texto)]
+    return max(acima, key=lambda l: (l.tamanho, l.bbox.y0)).texto if acima else "?"
+
+
+def _cotas_ambientes(ctx, pag, excl):
+    from .apresentacao import _escala
+    rx_a = re.compile(ctx.p("TAG-comum")["tag_ambiente"]["regex_area"])
+    p6, p7 = ctx.p("CON-06"), ctx.p("CON-07")
+    rx_cota = re.compile(p6["regex_cota"])
+    rx_el = re.compile(p7["regex_nivel"])
+    sem_dim, sem_el = [], []
+    for v in pag.vistas:
+        if v.tipo not in p6["tipos_vista"] or v.area is None:
+            continue
+        escala = (_escala(v.escala.texto) if v.escala else None) or p6["escala_padrao"]
+        ls = linhas_da_vista(pag, v, excl)
+        for a in ls:
+            m = rx_a.match(a.texto)
+            if not m:
+                continue
+            lado_m = float(m.group("valor").replace(",", ".")) ** 0.5
+            raio = max(p6["raio_min_pt"], ctx.cfg.mm_para_pt(p6["fator_raio"] * lado_m * 1000 / escala))
+            r = fitz.Rect(a.cx - raio, a.cy - raio, a.cx + raio, a.cy + raio)
+            perto = [l for l in ls if l is not a and dentro(l, r)]
+            nome = _nome_ambiente(a, perto)
+            if ctx.ativa("CON-06"):
+                # corrente de cotas: a largura pode estar em qualquer altura da vista, desde que na
+                # faixa de colunas do ambiente; o comprimento, na faixa de linhas
+                meio = raio * p6["fator_faixa"]
+                cotas = [l for l in ls if rx_cota.match(l.texto)]
+                largura = any(l.horizontal and abs(l.cx - a.cx) <= meio for l in cotas)
+                comprimento = any(not l.horizontal and abs(l.cy - a.cy) <= meio for l in cotas)
+                if not (largura and comprimento):
+                    sem_dim.append((nome, a.bbox))
+            if ctx.ativa("CON-07") and not any(rx_el.match(l.texto) for l in perto):
+                sem_el.append((nome, a.bbox))
+    _agrupado(ctx, "CON-06", pag, sem_dim)
+    _agrupado(ctx, "CON-07", pag, sem_el)
+
+
+def _pe_direito_corte(ctx, pag, v, ls):
+    p = ctx.p("CON-08")
+    rx_cota, rx_pd = re.compile(p["regex_cota"]), re.compile(p["regex_pd"])
+    vertical = any(not l.horizontal and rx_cota.match(l.texto) for l in ls)
+    if not vertical and not any(rx_pd.match(l.texto) for l in ls):
+        ctx.add("CON-08", pag.indice, v.titulo.bbox, vista=v.titulo.texto)
 
 
 # TAG-01 / TAG-02 -----------------------------------------------------------

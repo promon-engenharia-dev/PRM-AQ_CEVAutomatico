@@ -12,6 +12,8 @@ python -m PyInstaller --noconfirm --clean --onefile --windowed ^
     --paths "%CD%" ^
     --add-data "%CD%\regras.json;." ^
     --add-data "%CD%\verificador\web;verificador\web" ^
+    --add-data "%CD%\verificador\dic;verificador\dic" ^
+    --collect-data spellchecker ^
     --collect-submodules verificador ^
     --exclude-module numpy --exclude-module matplotlib --exclude-module pandas ^
     ferramentas\entrada_exe.py
@@ -24,6 +26,8 @@ python -m PyInstaller --noconfirm --clean --onefile --console ^
     --paths "%CD%" ^
     --add-data "%CD%\regras.json;." ^
     --add-data "%CD%\verificador\web;verificador\web" ^
+    --add-data "%CD%\verificador\dic;verificador\dic" ^
+    --collect-data spellchecker ^
     --collect-submodules verificador ^
     --exclude-module numpy --exclude-module matplotlib --exclude-module pandas ^
     ferramentas\entrada_exe.py

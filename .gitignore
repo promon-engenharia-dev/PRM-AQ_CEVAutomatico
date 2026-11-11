@@ -17,3 +17,6 @@ dist/
 
 # resultados de teste (contêm trechos dos documentos)
 saida_teste/
+
+# glossário local de nomes (verificação ortográfica)
+glossario_local.txt
