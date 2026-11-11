@@ -96,21 +96,78 @@ def _cotas_eixos(ctx, pag, v, ls):
 
 # CON-06 / CON-07 / CON-08 ----------------------------------------------------
 
-def _nome_ambiente(a, linhas) -> str:
-    """Nome escrito logo acima do 'A= … m²' (a linha em caixa alta mais próxima)."""
+def _nome_ambiente(a, linhas):
+    """Linha do nome escrito logo acima do 'A= … m²' (a linha em caixa alta mais próxima)."""
     acima = [l for l in linhas if l.bbox.y1 <= a.bbox.y0 + 1 and abs(l.cx - a.cx) < 60 and a.bbox.y0 - l.bbox.y1 < 60
              and re.search(r"[A-ZÁ-Ú]{3}", l.texto) and not l.texto.startswith(("EL", "("))
              and not re.fullmatch(r"[A-Z]{2,3}[\s\-]?\d{2,3}[A-Z]?", l.texto)]
-    return max(acima, key=lambda l: (l.tamanho, l.bbox.y0)).texto if acima else "?"
+    return max(acima, key=lambda l: (l.tamanho, l.bbox.y0)) if acima else None
+
+
+def _segmentos(ctx, indice: int) -> list:
+    """Segmentos de reta traçados na folha: (p1, p2, espessura, cor), no espaço de exibição."""
+    cache = ctx.__dict__.setdefault("_segmentos", {})
+    if indice not in cache:
+        desenhos, m = ctx.desenhos(indice)
+        cache[indice] = [(it[1] * m, it[2] * m, round(d.get("width") or 0, 3), d.get("color"))
+                         for d in desenhos if d.get("color") is not None
+                         for it in d["items"] if it[0] == "l" and abs(it[1] - it[2]) > 1]
+    return cache[indice]
+
+
+def _ponto_do_ambiente(ctx, pag, bloco: fitz.Rect, cx: float) -> fitz.Point | None:
+    """Ponta da linha de chamada que sai do topo ou da base da TAG (no eixo do nome) ou de uma lateral.
+    A TAG de ambiente pequeno fica fora dele, presa por essa linha; a ponta cai dentro do ambiente.
+    None quando não há linha de chamada (a TAG está dentro do ambiente)."""
+    lc = ctx.p("TAG-comum")["tag_ambiente"]["linha_chamada"]
+    segs = _segmentos(ctx, pag.indice)
+    tc, tb, te = lc["tolerancia_centro_pt"], lc["tolerancia_borda_pt"], lc["tolerancia_encadeamento_pt"]
+
+    def vertical(p, q):
+        return (abs(p.x - cx) <= tc and (abs(p.y - bloco.y0) <= tb or abs(p.y - bloco.y1) <= tb)
+                and (q.y < bloco.y0 - tb or q.y > bloco.y1 + tb))
+
+    def lateral(p, q):
+        return (bloco.y0 <= p.y <= bloco.y1 and (abs(p.x - bloco.x0) <= tb or abs(p.x - bloco.x1) <= tb)
+                and (q.x < bloco.x0 - tb or q.x > bloco.x1 + tb) and abs(q.y - p.y) < abs(q.x - p.x))
+
+    def seguir(atual, ponta):
+        """Segue os segmentos encadeados (mesma espessura e cor); devolve a ponta e o comprimento."""
+        usados, total = {id(atual)}, abs(atual[0] - atual[1])
+        for _ in range(lc["max_segmentos"]):
+            prox = next(((s, q) for s in segs if id(s) not in usados and s[2] == atual[2] and s[3] == atual[3]
+                         for p, q in ((s[0], s[1]), (s[1], s[0]))
+                         if abs(p - ponta) <= te and abs(q - ponta) > te), None)
+            if prox is None:
+                break
+            atual, ponta = prox
+            usados.add(id(atual))
+            total += abs(atual[0] - atual[1])
+        return ponta, total
+
+    # entre as linhas que saem da TAG, a de chamada é o caminho contínuo mais longo
+    # (linha de eixo tracejada e contorno de pílula ficam curtos)
+    for criterio in (vertical, lateral):
+        caminhos = [seguir(s, q) for s in segs for p, q in ((s[0], s[1]), (s[1], s[0])) if criterio(p, q)]
+        caminhos = [c for c in caminhos if c[1] >= lc["comprimento_min_pt"]]
+        if caminhos:
+            return max(caminhos, key=lambda c: c[1])[0]
+    return None
 
 
 def _cotas_ambientes(ctx, pag, excl):
     from .apresentacao import _escala
-    rx_a = re.compile(ctx.p("TAG-comum")["tag_ambiente"]["regex_area"])
+    t = ctx.p("TAG-comum")["tag_ambiente"]
+    rx_a = re.compile(t["regex_area"])
+    rx_pd = re.compile(t["regex_pd"])
+    rx_acab = re.compile(t["regex_acabamento"])
     p6, p7 = ctx.p("CON-06"), ctx.p("CON-07")
     rx_cota = re.compile(p6["regex_cota"])
     rx_el = re.compile(p7["regex_nivel"])
     sem_dim, sem_el = [], []
+    # o recorte da vista pode cortar a borda do desenho: perto do ambiente vale todo o texto da folha
+    car = pag.carimbo.area if pag.carimbo else None
+    folha = [l for l in pag.linhas if not dentro(l, car)]
     for v in pag.vistas:
         if v.tipo not in p6["tipos_vista"] or v.area is None:
             continue
@@ -122,20 +179,38 @@ def _cotas_ambientes(ctx, pag, excl):
                 continue
             lado_m = float(m.group("valor").replace(",", ".")) ** 0.5
             raio = max(p6["raio_min_pt"], ctx.cfg.mm_para_pt(p6["fator_raio"] * lado_m * 1000 / escala))
-            r = fitz.Rect(a.cx - raio, a.cy - raio, a.cx + raio, a.cy + raio)
-            perto = [l for l in ls if l is not a and dentro(l, r)]
-            nome = _nome_ambiente(a, perto)
+            nome_l = _nome_ambiente(a, [l for l in ls if l is not a])
+            nome = nome_l.texto if nome_l else "?"
+            # bloco da TAG: do nome até o PD (ou o próprio A=), na coluna do nome
+            bloco = fitz.Rect(a.bbox) | (nome_l.bbox if nome_l else a.bbox)
+            pd = [l for l in ls if rx_pd.match(l.texto) and 0 <= l.bbox.y0 - a.bbox.y1 <= a.bbox.height * 2
+                  and abs(l.cx - a.cx) < 30]
+            if pd:
+                bloco |= pd[0].bbox
+            for l in ls:                                  # códigos de acabamento entre o nome e o A=
+                if rx_acab.fullmatch(l.texto) and bloco.y0 <= l.cy <= a.bbox.y0 and abs(l.cx - a.cx) < 40:
+                    bloco |= fitz.Rect(l.bbox.x0 - 3, l.bbox.y0 - 1, l.bbox.x1 + 3, l.bbox.y1 + 1)   # contorno da pílula
+            cx = nome_l.cx if nome_l else a.cx
+            ponto = _ponto_do_ambiente(ctx, pag, bloco, cx)
+            if ponto is None or not v.area.contains(ponto):
+                ponto = fitz.Point(a.cx, a.cy)          # sem linha de chamada: TAG dentro do ambiente
+            r = fitz.Rect(ponto.x - raio, ponto.y - raio, ponto.x + raio, ponto.y + raio)
             if ctx.ativa("CON-06"):
                 # corrente de cotas: a largura pode estar em qualquer altura da vista, desde que na
                 # faixa de colunas do ambiente; o comprimento, na faixa de linhas
                 meio = raio * p6["fator_faixa"]
-                cotas = [l for l in ls if rx_cota.match(l.texto)]
-                largura = any(l.horizontal and abs(l.cx - a.cx) <= meio for l in cotas)
-                comprimento = any(not l.horizontal and abs(l.cy - a.cy) <= meio for l in cotas)
+                cotas = [l for l in ls if rx_cota.match(l.texto)] + [l for l in folha if rx_cota.match(l.texto) and dentro(l, r)]
+                largura = any(l.horizontal and abs(l.cx - ponto.x) <= meio for l in cotas)
+                comprimento = any(not l.horizontal and abs(l.cy - ponto.y) <= meio for l in cotas)
                 if not (largura and comprimento):
                     sem_dim.append((nome, a.bbox))
-            if ctx.ativa("CON-07") and not any(rx_el.match(l.texto) for l in perto):
-                sem_el.append((nome, a.bbox))
+            if ctx.ativa("CON-07"):
+                na_tag = fitz.Rect(bloco.x0 - 20, bloco.y0, bloco.x1 + 20, bloco.y1 + a.bbox.height * 4)
+                # a linha que encosta na TAG pode ser chamada de acabamento, não do ambiente: vale também
+                # o EL. em volta da própria TAG
+                r_tag = fitz.Rect(a.cx - raio, a.cy - raio, a.cx + raio, a.cy + raio)
+                if not any(rx_el.match(l.texto) and (dentro(l, r) or dentro(l, r_tag) or dentro(l, na_tag)) for l in folha):
+                    sem_el.append((nome, a.bbox))
     _agrupado(ctx, "CON-06", pag, sem_dim)
     _agrupado(ctx, "CON-07", pag, sem_el)
 

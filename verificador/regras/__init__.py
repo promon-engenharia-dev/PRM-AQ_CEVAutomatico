@@ -32,6 +32,16 @@ class Contexto:
         """Tabelas, blocos de texto e carimbo: o que não faz parte de nenhuma vista."""
         return [t.area for t in p.tabelas] + [b.area for b in self.blocos[p.indice]] + ([p.carimbo.area] if p.carimbo else [])
 
+    def desenhos(self, indice: int) -> tuple[list, fitz.Matrix]:
+        """Vetores da folha (get_drawings) e a matriz para o espaço de exibição.
+        Lidos uma vez só: são a parte mais lenta da verificação."""
+        cache = self.__dict__.setdefault("_desenhos", {})
+        if indice not in cache:
+            with fitz.open(self.doc.caminho) as pdf:
+                page = pdf[indice]
+                cache[indice] = (page.get_drawings(), page.rotation_matrix)
+        return cache[indice]
+
     def ativa(self, codigo: str) -> bool:
         return self.cfg.ativa(codigo)
 

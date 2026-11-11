@@ -63,10 +63,9 @@ def _vocabulario(cfg) -> list[str]:
     return [normalizar(t) for t in termos]
 
 
-def _preenchidos(page: fitz.Page, canal_min: int):
+def _preenchidos(desenhos: list, m: fitz.Matrix, canal_min: int):
     """Preenchimentos claros e coloridos (candidatos a setor), já no espaço de exibição."""
-    m = page.rotation_matrix
-    for d in page.get_drawings():
+    for d in desenhos:
         f = d.get("fill")
         if not f or d.get("type") not in ("f", "fs"):
             continue
@@ -85,43 +84,42 @@ def detectar(ctx) -> list[Legenda]:
     lado_min, lado_max = (mm(v) for v in det["amostra_lado_mm"])
     vocab = _vocabulario(cfg)
     legendas = []
-    with fitz.open(ctx.doc.caminho) as pdf:
-        for pag in ctx.doc.paginas:
-            page = pdf[pag.indice]
-            todos = list(_preenchidos(page, det["amostra_canal_min"]))
-            amostras = [(cor, r) for cor, r, d in todos
-                        if lado_min <= r.width <= lado_max and lado_min <= r.height <= lado_max
-                        and max(r.width, r.height) / min(r.width, r.height) <= det["amostra_proporcao_max"]
-                        and len(d["items"]) <= 5]
-            # agrupa por tamanho: uma legenda usa amostras iguais
-            grupos: list[list] = []
-            for cor, r in sorted(amostras, key=lambda a: (round(a[1].width), round(a[1].height))):
-                g = next((g for g in grupos if abs(g[0][1].width - r.width) <= mm(det["amostra_tolerancia_tamanho_mm"])
-                          and abs(g[0][1].height - r.height) <= mm(det["amostra_tolerancia_tamanho_mm"])), None)
-                (g.append((cor, r)) if g is not None else grupos.append([(cor, r)]))
-            for g in grupos:
-                if len(g) < det["amostras_minimas"]:
-                    continue
-                itens = []
-                for cor, r in g:
-                    # texto da mesma linha, à direita, até a próxima amostra dessa linha
-                    prox = min((o.x0 for _, o in g if o.x0 > r.x1 and abs(o.y0 - r.y0) < r.height / 2),
-                               default=r.x1 + mm(det["texto_largura_max_mm"]))
-                    ls = [l for l in pag.linhas if l.bbox.x0 >= r.x1 - 1 and l.bbox.x0 <= r.x1 + mm(det["texto_distancia_max_mm"])
-                          and l.bbox.x0 < prox and abs(l.cy - (r.y0 + r.y1) / 2) < r.height]
-                    if ls:
-                        itens.append(Item(" ".join(l.texto for l in sorted(ls, key=lambda l: l.bbox.x0)).strip(), cor, r))
-                if len(itens) < det["amostras_minimas"]:
-                    continue
-                setores = sum(1 for i in itens if any(v in normalizar(i.nome) for v in vocab))
-                if setores / len(itens) < det["fracao_nomes_setor"]:
-                    continue              # legenda de outra coisa (ex.: blocos A/B/C)
-                leg = Legenda(pag.indice, sorted(itens, key=lambda i: (i.amostra.x0, i.amostra.y0)))
-                amostras_leg = [i.amostra for i in leg.itens]
-                for cor, r, _ in todos:
-                    if not any(r.intersects(a) and abs(r.width - a.width) < 1 for a in amostras_leg):
-                        leg.usos.setdefault(cor, []).append(r)
-                legendas.append(leg)
+    for pag in ctx.doc.paginas:
+        desenhos, m = ctx.desenhos(pag.indice)
+        todos = list(_preenchidos(desenhos, m, det["amostra_canal_min"]))
+        amostras = [(cor, r) for cor, r, d in todos
+                    if lado_min <= r.width <= lado_max and lado_min <= r.height <= lado_max
+                    and max(r.width, r.height) / min(r.width, r.height) <= det["amostra_proporcao_max"]
+                    and len(d["items"]) <= 5]
+        # agrupa por tamanho: uma legenda usa amostras iguais
+        grupos: list[list] = []
+        for cor, r in sorted(amostras, key=lambda a: (round(a[1].width), round(a[1].height))):
+            g = next((g for g in grupos if abs(g[0][1].width - r.width) <= mm(det["amostra_tolerancia_tamanho_mm"])
+                      and abs(g[0][1].height - r.height) <= mm(det["amostra_tolerancia_tamanho_mm"])), None)
+            (g.append((cor, r)) if g is not None else grupos.append([(cor, r)]))
+        for g in grupos:
+            if len(g) < det["amostras_minimas"]:
+                continue
+            itens = []
+            for cor, r in g:
+                # texto da mesma linha, à direita, até a próxima amostra dessa linha
+                prox = min((o.x0 for _, o in g if o.x0 > r.x1 and abs(o.y0 - r.y0) < r.height / 2),
+                           default=r.x1 + mm(det["texto_largura_max_mm"]))
+                ls = [l for l in pag.linhas if l.bbox.x0 >= r.x1 - 1 and l.bbox.x0 <= r.x1 + mm(det["texto_distancia_max_mm"])
+                      and l.bbox.x0 < prox and abs(l.cy - (r.y0 + r.y1) / 2) < r.height]
+                if ls:
+                    itens.append(Item(" ".join(l.texto for l in sorted(ls, key=lambda l: l.bbox.x0)).strip(), cor, r))
+            if len(itens) < det["amostras_minimas"]:
+                continue
+            setores = sum(1 for i in itens if any(v in normalizar(i.nome) for v in vocab))
+            if setores / len(itens) < det["fracao_nomes_setor"]:
+                continue              # legenda de outra coisa (ex.: blocos A/B/C)
+            leg = Legenda(pag.indice, sorted(itens, key=lambda i: (i.amostra.x0, i.amostra.y0)))
+            amostras_leg = [i.amostra for i in leg.itens]
+            for cor, r, _ in todos:
+                if not any(r.intersects(a) and abs(r.width - a.width) < 1 for a in amostras_leg):
+                    leg.usos.setdefault(cor, []).append(r)
+            legendas.append(leg)
     ctx._setorizacao = legendas
     return legendas
 

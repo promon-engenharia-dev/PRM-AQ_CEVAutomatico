@@ -1157,6 +1157,14 @@
           "abaixo": 22
         },
         "janela_tamanho_ref_pt": 8,
+        "linha_chamada": {
+          "tolerancia_centro_pt": 4,
+          "tolerancia_borda_pt": 6,
+          "tolerancia_encadeamento_pt": 1.0,
+          "max_segmentos": 8,
+          "comprimento_min_pt": 15,
+          "observacao": "11/11/2026: a TAG de ambiente pequeno fica fora dele, presa por uma linha de chamada que sai do topo ou da base da TAG, no eixo do nome. A ponta dessa linha (seguindo segmentos encadeados de mesma espessura e cor) é a posição do ambiente para CON-06/07."
+        },
         "observacao": "10/11/2026 (falsos 'falta PD/acabamento' em TAGs preenchidas): a janela cresce com o corpo do texto 'A=' (janela_pt vale para 8 pt) e gira com a TAG vertical; PD aceita 'PÉ-DIREITO'; os códigos de acabamento são contados dentro de cada linha (PI-10, PI10/TE30, PI10A)."
       }
     },
@@ -1766,15 +1774,15 @@
       "observacao": "Só em documento cuja tabela menciona TELHA (cobertura de telha; laje não conta)."
     },
     "CON-06": {
-      "ativa": false,
-      "lote": 2,
-      "status_teste": "11/11/2026: 25 achados em 23 dos 40 CEVs. Amostra conferida no desenho (T012-0211 PORTARIA, T015-1304 ESCRITÓRIO, T015-1310 DML, 6110-0002, 7610-0002): falsos — a TAG fica fora do ambiente, presa por linha de chamada, e as cotas estão no ambiente. Lote 2 até a regra seguir a linha de chamada; a versão Claude cobre (RA-02).",
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "11/11/2026 (2ª rodada): ativa. A posição do ambiente vem da ponta da linha de chamada da TAG (TAG-comum.tag_ambiente.linha_chamada). 40 CEVs: 25 → 2 achados (T015-1304-0002 R2 e 7610-0005), ambos junto de marca da verificadora.",
       "severidade": "ATENCAO",
       "tipos_vista": ["PLANTA_BAIXA"],
       "regex_cota": "^\\d{2,5}([,.]\\d{1,2})?$",
       "fator_raio": 1.0,
       "raio_min_pt": 40,
-      "fator_faixa": 0.5,
+      "fator_faixa": 1.0,
       "escala_padrao": 100,
       "comentario": "Cotar as dimensões do ambiente {ambiente} (largura e comprimento).",
       "comentario_agrupado": "Ambientes sem cotas de dimensão nas duas direções: {ambientes}.",
@@ -1783,9 +1791,9 @@
       "observacao": "Para cada TAG de ambiente (A= … m²) na planta baixa: exige uma cota numérica horizontal na faixa de colunas do ambiente e uma vertical na faixa de linhas, em qualquer ponto da vista (correntes de cota da borda contam). Meia-largura da faixa = fator_faixa × fator_raio × √A, pela escala da vista (mínimo raio_min_pt × fator_faixa)."
     },
     "CON-07": {
-      "ativa": false,
-      "lote": 2,
-      "status_teste": "11/11/2026: 25 achados em 23 dos 40 CEVs, mesmo problema da CON-06 (TAG fora do ambiente; o EL. está dentro do ambiente). Lote 2; a versão Claude cobre (RA-02).",
+      "ativa": true,
+      "lote": 1,
+      "status_teste": "11/11/2026 (2ª rodada): ativa. Segue a linha de chamada da TAG; aceita EL. em volta da ponta ou da própria TAG; procura em todo o texto da folha (o recorte da vista pode cortar a borda). 40 CEVs: 25 → 19 achados em 18 docs (um comentário por folha), 11 junto de marca. Amostras conferidas no desenho (S. PCD 7610-0002, consultórios, PREP. - MASSAS 6110-0002, baias T015-1303, LABORATÓRIO T015-1310): ambientes de fato sem EL.",
       "severidade": "ATENCAO",
       "tipos_vista": ["PLANTA_BAIXA"],
       "regex_nivel": "^EL\\.?\\s*[+\\-±]?\\s*(\\d|\\?)",
@@ -1793,7 +1801,7 @@
       "comentario_agrupado": "Ambientes sem cota de nível (EL.): {ambientes}.",
       "max_ambientes_listados": 6,
       "fonte": "Pedido da usuária (10/11/2026): cota de nível em cada ambiente; CK B30",
-      "observacao": "Procura EL. num quadrado em volta da TAG com meio-lado = fator_raio × √A da CON-06 (pela escala da vista). Complementa a CON-01, que só exige uma cota de nível por vista."
+      "observacao": "Procura EL. num quadrado em volta da ponta da linha de chamada (ou da TAG) com meio-lado = fator_raio × √A da CON-06 (pela escala da vista). Complementa a CON-01, que só exige uma cota de nível por vista."
     },
     "CON-08": {
       "ativa": true,

@@ -47,11 +47,9 @@ def verificar(ctx):
 
 
 def _preenchimentos(ctx, pag) -> list[fitz.Rect]:
-    with fitz.open(ctx.doc.caminho) as pdf:
-        page = pdf[pag.indice]
-        m = page.rotation_matrix
-        return [d["rect"] * m for d in page.get_drawings()
-                if d.get("fill") and d.get("type") in ("f", "fs") and (d.get("fill_opacity") or 1) > 0.5]
+    desenhos, m = ctx.desenhos(pag.indice)
+    return [d["rect"] * m for d in desenhos
+            if d.get("fill") and d.get("type") in ("f", "fs") and (d.get("fill_opacity") or 1) > 0.5]
 
 
 def _cortada(l, fills, lo, hi) -> bool:

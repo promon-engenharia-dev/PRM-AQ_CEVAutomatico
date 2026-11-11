@@ -780,3 +780,29 @@ Para rodar os protótipos: `python -X utf8 -m verificador --lote 2 arquivo.pdf`.
 
 **Total nos 40 CEVs (lote 1):** 253 → 322 achados (+64 VOC-04, +4 PRA-13, +1 CON-08).
 
+## 23. Cotas do ambiente pela linha de chamada da TAG (11/11/2026)
+
+**Pedido:** ativar as cotas de nível e de dimensão por ambiente, que o §22 deixou no lote 2 porque a TAG de ambiente pequeno fica fora do ambiente.
+
+**Como ficou** (`regras/conteudo.py`, `TAG-comum.tag_ambiente.linha_chamada`):
+- O contorno da TAG vai do nome ao PD, incluindo as pílulas dos códigos de acabamento.
+- A linha de chamada é o segmento que sai do **topo ou da base, no eixo do nome**, ou de **uma lateral**. A regra segue os segmentos encadeados de mesma espessura e cor até a ponta. Entre as linhas que saem da TAG, fica o caminho contínuo mais longo, com pelo menos 15 pt; linha de eixo tracejada e contorno de pílula ficam curtos.
+- A ponta é a posição do ambiente. Sem linha de chamada, vale a própria TAG.
+- **CON-06:** cota horizontal na faixa de colunas e cota vertical na faixa de linhas da ponta, com meia-largura igual a √A pela escala da vista.
+- **CON-07:** EL. num quadrado em volta da ponta ou da própria TAG. A segunda opção existe porque uma chamada de acabamento pode encostar na TAG.
+- O texto é procurado em toda a folha, e não só no recorte da vista: no 6110-0002 o recorte cortava o "EL. 0,340" da CÂMARA REFRIGERADA.
+- **Desempenho:** os vetores da folha (`get_drawings`) agora são lidos uma vez só (`Contexto.desenhos`) e compartilhados por setorização, composição e TAG.
+
+**Resultado nos 40 CEVs:**
+
+| Regra | §22 | Agora | Leitura |
+|---|---|---|---|
+| CON-06 | 25 em 23 docs | **2 em 2 docs** | ambos junto de marca da verificadora ("cotar largura da calçada" no 7610-0005) |
+| CON-07 | 25 em 23 docs | **19 em 18 docs** | 11 junto de marca. Amostras conferidas no desenho: S. PCD e consultórios (7610-0002), PREP. - MASSAS (6110-0002), baias de resíduos (T015-1303), LABORATÓRIO (T015-1310), todos de fato sem EL. |
+
+Pontas conferidas por imagem: DML (T015-1310-0002), PORTARIA e SANITÁRIO (T012-0211), DESCARTÁVEIS, CÂMARA REFRIGERADA e PREP. - MASSAS (6110-0002), ESCRITÓRIO (T015-1304-0001), COPA, S. PCD e CONSULTÓRIO 3 (7610-0002), SANIT. FEM. (6110-0011).
+
+**Estado:** CON-06 e CON-07 **ativas**. A CON-04 (entre eixos) continua no lote 2.
+
+**Total nos 40 CEVs (lote 1):** 322 → 343 achados.
+
